@@ -30,10 +30,18 @@
         </div>
         <div class="column">
             <h4>Follow Us</h4>
-            <a href="#"><i class="fab fa-facebook-f"></i> Facebook</a>
-            <a href="#"><i class="fab fa-twitter"></i> Twitter</a>
-            <a href="#"><i class="fab fa-instagram"></i> Instagram</a>
-            <a href="#"><i class="fab fa-linkedin"></i> LinkedIn</a>
+            <a href="#">
+            <font-awesome-icon :icon="['fab', 'facebook-f']" class="social-icon"/> Facebook
+            </a>
+            <a href="#">
+            <font-awesome-icon :icon="['fab', 'twitter']" class="social-icon"/> Twitter
+            </a>
+            <a href="#">
+            <font-awesome-icon :icon="['fab', 'instagram']" class="social-icon"/> Instagram
+            </a>
+            <a href="#">
+            <font-awesome-icon :icon="['fab', 'linkedin']" class="social-icon"/> LinkedIn
+            </a>
         </div>
         <div class="column">
             <h4>Newsletter</h4>

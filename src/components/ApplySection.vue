@@ -75,7 +75,7 @@ import consImage from "@/assets/cons.png"
   margin-bottom: 10px;
 }
 
-.brief-case-icon  {
+.apply-section .left-content .header .brief-case-icon  {
   font-size: 4rem;
   color: #ffc107;
   margin-right: 20px;
@@ -121,12 +121,12 @@ import consImage from "@/assets/cons.png"
   box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
 }
 
-button .arrow-icon {
+.apply-section .left-content button .arrow-icon {
   font-size: 1.2rem;
   transition: transform 0.3s ease;
 }
 
-button .arrow-icon:hover  {
+.apply-section .left-content button:hover .arrow-icon  {
   transform: translateX(10px);
 }
 
@@ -206,8 +206,8 @@ h2 {
   box-shadow: 0 16px 32px rgba(0, 0, 0, 0.2); /* Darker shadow on hover */
 }
 
-.steps .apply-icon:hover  {
-  color: #856b1d; /* Darker blue color for icons on hover */
+.step:hover .apply-icon {
+  color: #917934; /* Darker blue color for icons on hover */
 }
 
 @keyframes fadeInUp {

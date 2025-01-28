@@ -7,7 +7,11 @@ import App from './App.vue'
 import router from './router'
 import { 
   faGooglePlay,
-  faApple
+  faApple,
+  faFacebookF,
+  faTwitter,
+  faInstagram,
+  faLinkedin 
 } from '@fortawesome/free-brands-svg-icons';
 
 import {
@@ -51,6 +55,10 @@ library.add(
   faCheckCircle,
   faGooglePlay,
   faApple,
+  faFacebookF, 
+  faTwitter, 
+  faInstagram, 
+  faLinkedin
 );
 
 

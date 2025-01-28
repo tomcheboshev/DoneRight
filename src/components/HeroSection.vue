@@ -34,8 +34,8 @@
   transition: opacity 1.5s ease-out, transform 1.5s ease-out; /* Smooth opacity and translation */
   background: 
     linear-gradient(to left, rgba(33, 37, 41, 0.8), rgba(33, 37, 41, 0.8)), 
-    url('assets/cleaner.png') no-repeat left center, /* Add image on the left */
-    url('assets/shkl.png') no-repeat right center; /* Add image on the right */
+    url('majstor-01.png') no-repeat left center, /* Add image on the left */
+    url('majstor-02.png') no-repeat right center; /* Add image on the right */
   background-size: contain, contain, contain; /* Ensure images fit nicely */
   background-blend-mode: overlay; /* Apply transparency to both images */
 }
@@ -114,7 +114,7 @@
   .hero {
     background: 
       linear-gradient(to left, rgba(33, 37, 41, 0.8), rgba(33, 37, 41, 0.8)), 
-      url('kgj.png') no-repeat center center; /* Show only one image */
+      url('majstor-03.png') no-repeat center center; /* Show only one image */
     background-size: auto 90%, cover; /* Scale the single image nicely */
     padding: 150px 10px; /* Adjust padding */
   }

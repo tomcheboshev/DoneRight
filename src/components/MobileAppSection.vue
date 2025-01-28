@@ -113,7 +113,7 @@ import QrCodeImage from '@/assets/QR.png'
 .mobile-app-section .text-content {
   flex: 1;
   max-width: 50%;
-  text-align: left;
+  text-align: center;
   padding: 10px;
 }
 
@@ -213,20 +213,14 @@ import QrCodeImage from '@/assets/QR.png'
     flex-direction: column; /* Stack elements vertically */
   }
 
-  /* Ensure QR Code Goes Below */
+  /* Hide QR Code Section on Small Screens */
   .mobile-app-section .qr-code-content {
-    max-width: 100%; /* Full width for QR code */
-    margin-top: 20px; /* Space above QR code */
+    display: none;
   }
 
   .mobile-app-section .text-content {
     max-width: 100%; /* Full width for text */
     text-align: center; /* Center align text */
-  }
-
-  /* Adjust QR Code Size */
-  .mobile-app-section .qr-code-img {
-    max-width: 50%; /* Smaller QR code for mobile */
   }
 }
 

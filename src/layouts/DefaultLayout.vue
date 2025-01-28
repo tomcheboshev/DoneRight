@@ -24,7 +24,5 @@ export default {
 </script>
 
 <style scoped>
-main {
-  padding: 20px;
-}
+
 </style>

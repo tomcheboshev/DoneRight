@@ -1,16 +1,18 @@
 <script setup>
 import { RouterLink} from 'vue-router';
+import LogoImg from "@/assets/logo.png"
 </script>
 
 <template>
+  
       <header>
         <div class="logo">
-            
+            <img :src="LogoImg" alt="Logo">
         </div>
         <nav class="desktop-nav">
             <a href="#hero">Home</a>
             <a href="#categories">Services</a>
-            <RouterLink to="#ourvision">Our Vision</RouterLink>
+            <RouterLink to="about">Our Vision</RouterLink>
             <a href="#apply">Become a Master</a>
         </nav>
         <div class="auth">
