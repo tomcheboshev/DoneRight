@@ -46,7 +46,7 @@ import consImage from "@/assets/cons.png"
 <style scoped>
 .apply-section {
   padding: 120px 20px;
-  background: linear-gradient(to right, #212529, #343a40);
+  background-color: #212529;
   position: relative;
   overflow: hidden;
   transition: background 0.3s ease;
@@ -171,7 +171,7 @@ h2 {
 }
 
 .step {
-  background-color: #212529;
+  background-color: #131518;
   padding: 40px;
   text-align: center;
   box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
@@ -221,8 +221,38 @@ h2 {
   }
 }
 
+@media (max-width: 1024px){
+  .apply-section .right-content img {
+    display: none;
+}
+ .apply-section .left-content {
+  max-width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+} 
+.apply-section .content {
+
+  gap: 0px;
+}
+
+}
 /* Responsive adjustments */
 @media (max-width: 768px) {
+
+  .apply-section .left-content {
+    max-width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    
+  }
+.apply-section .content{
+ 
+}
+
   .steps {
     grid-template-columns: 1fr; /* Single-column layout on smaller screens */
     gap: 20px;

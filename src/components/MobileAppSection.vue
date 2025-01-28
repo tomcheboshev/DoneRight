@@ -22,21 +22,21 @@ import QrCodeImage from '@/assets/QR.png'
 
 <style scoped>
 .mobile-app-section {
-  background: linear-gradient(to right, #212529, #343a40);
+  background-color: #212529;
   color: white;
   padding: 70px 15px;
   display: flex;
   justify-content: center;
   align-items: center;
-  margin: 50px 20px; /* Adjusted margin for better responsiveness */
-  border-radius: 20px;
+  margin: 50px 100px; /* Adjusted margin for better responsiveness */
+  border-radius: 40px;
   position: relative;
   overflow: hidden;
   flex-wrap: nowrap;
 }
 
 /* Animated Background Elements */
-.mobile-app-section::before,
+/* .mobile-app-section::before,
 .mobile-app-section::after {
   content: "";
   position: absolute;
@@ -67,7 +67,7 @@ import QrCodeImage from '@/assets/QR.png'
   }
 }
 
-/* Stripes Animation */
+
 .mobile-app-section::after {
   content: "";
   position: absolute;
@@ -97,7 +97,7 @@ import QrCodeImage from '@/assets/QR.png'
   100% {
     background-position: 40px 40px;
   }
-}
+} */
 
 /* Content Styles */
 .mobile-app-section .content {
@@ -208,15 +208,22 @@ import QrCodeImage from '@/assets/QR.png'
 }
 
 /* Responsive Adjustments */
+@media (max-width: 1024px){
+  .mobile-app-section .qr-code-content {
+    display: none;
+  }
+  .mobile-app-section .text-content {
+  max-width: 100%;
+}
+}
+
 @media (max-width: 768px) {
   .mobile-app-section {
     flex-direction: column; /* Stack elements vertically */
   }
 
   /* Hide QR Code Section on Small Screens */
-  .mobile-app-section .qr-code-content {
-    display: none;
-  }
+  
 
   .mobile-app-section .text-content {
     max-width: 100%; /* Full width for text */

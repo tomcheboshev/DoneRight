@@ -33,7 +33,7 @@
   transform: translateY(20px);
   transition: opacity 1.5s ease-out, transform 1.5s ease-out; /* Smooth opacity and translation */
   background: 
-    linear-gradient(to left, rgba(33, 37, 41, 0.8), rgba(33, 37, 41, 0.8)), 
+    linear-gradient(to left, #212529, #212529), 
     url('majstor-01.png') no-repeat left center, /* Add image on the left */
     url('majstor-02.png') no-repeat right center; /* Add image on the right */
   background-size: contain, contain, contain; /* Ensure images fit nicely */
