@@ -1,11 +1,12 @@
 <script setup>
-
+import DefaultLayout from '@/layouts/DefaultLayout.vue';
 </script>
 
 <template>
-<h1>our vision</h1>
+ <DefaultLayout>
+  
+ </DefaultLayout>
 </template>
 
 <style scoped>
-
 </style>

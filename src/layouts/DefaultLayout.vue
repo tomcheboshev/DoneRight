@@ -1,17 +1,18 @@
 <template>
   <div>
-    <HeaderSection /> <!-- Common Header -->
-
-    <!-- Dynamic Content -->
+    <HeaderSection />
+    
     <main>
-      <slot /> <!-- Default slot for page content -->
+      <PreloaderSection />
+      <slot></slot> 
     </main>
 
-    <FooterSection /> <!-- Common Footer -->
+    <FooterSection />
   </div>
 </template>
 
 <script>
+import PreloaderSection from '@/components/PreloaderSection.vue';
 import HeaderSection from '@/components/HeaderSection.vue';
 import FooterSection from '@/components/FooterSection.vue';
 
@@ -19,10 +20,9 @@ export default {
   components: {
     HeaderSection,
     FooterSection,
+    PreloaderSection,
   },
 };
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

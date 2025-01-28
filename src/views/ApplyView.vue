@@ -1,7 +1,11 @@
+<script setup>
+import DefaultLayout from '@/layouts/DefaultLayout.vue';
+</script>
+
 <template>
-  <div class="apply">
-    <h1>This is an apply page</h1>
-  </div>
+ <DefaultLayout>
+  
+ </DefaultLayout>
 </template>
 
 <style scoped>
