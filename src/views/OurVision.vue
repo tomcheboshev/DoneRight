@@ -1,9 +1,9 @@
 <script setup>
-import OurVision from '@/components/OurVision.vue';
+
 </script>
 
 <template>
-  <OurVision />
+<h1>our vision</h1>
 </template>
 
 <style scoped>

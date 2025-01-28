@@ -4,25 +4,23 @@ import LogoImg from "@/assets/logo.png"
 </script>
 
 <template>
-  
-      <header>
-        <div class="logo">
-            <img :src="LogoImg" alt="Logo">
-        </div>
-        <nav class="desktop-nav">
-            <a href="#hero">Home</a>
-            <a href="#categories">Services</a>
-            <RouterLink to="about">Our Vision</RouterLink>
-            <a href="#apply">Become a Master</a>
-        </nav>
-        <div class="auth">
-          <font-awesome-icon :icon="['fas', 'user']" id="loginIcon" />
-        </div>
-        <div class="menu-icon">
-          <font-awesome-icon :icon="['fas', 'bars']" />
-        </div>
-    </header>
-
+  <header>
+    <div class="logo">
+      <img :src="LogoImg" alt="Logo">
+    </div>
+    <nav class="desktop-nav">
+      <RouterLink to="/">Home</RouterLink>
+      <RouterLink to="/services">Services</RouterLink>
+      <RouterLink to="/ourvision">Our Vision</RouterLink>
+      <RouterLink to="/apply">Become a Master</RouterLink>
+    </nav>
+    <div class="auth">
+      <font-awesome-icon :icon="['fas', 'user']" id="loginIcon" />
+    </div>
+    <div class="menu-icon">
+      <font-awesome-icon :icon="['fas', 'bars']" />
+    </div>
+  </header>
 </template>
 
 <style scoped>
