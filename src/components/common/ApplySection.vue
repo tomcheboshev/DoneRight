@@ -249,9 +249,6 @@ h2 {
     text-align: center;
     
   }
-.apply-section .content{
- 
-}
 
   .steps {
     grid-template-columns: 1fr; /* Single-column layout on smaller screens */

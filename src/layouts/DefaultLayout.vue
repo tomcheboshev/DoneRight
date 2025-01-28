@@ -12,9 +12,9 @@
 </template>
 
 <script>
-import PreloaderSection from '@/components/PreloaderSection.vue';
-import HeaderSection from '@/components/HeaderSection.vue';
-import FooterSection from '@/components/FooterSection.vue';
+import PreloaderSection from '@/components/common/PreloaderSection.vue';
+import HeaderSection from '@/components/common/HeaderSection.vue';
+import FooterSection from '@/components/common/FooterSection.vue';
 
 export default {
   components: {

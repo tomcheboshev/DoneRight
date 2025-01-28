@@ -15,7 +15,7 @@ import LogoImg from "@/assets/logo.png"
       <RouterLink to="/apply">Become a Master</RouterLink>
     </nav>
     <div class="auth">
-      <font-awesome-icon :icon="['fas', 'user']" id="loginIcon" />
+      <RouterLink to="/login"><font-awesome-icon :icon="['fas', 'user']" id="loginIcon" /></RouterLink>
     </div>
     <div class="menu-icon">
       <font-awesome-icon :icon="['fas', 'bars']" />
@@ -24,6 +24,8 @@ import LogoImg from "@/assets/logo.png"
 </template>
 
 <style scoped>
+
+
   header {
   display: flex;
   justify-content: space-between;
@@ -65,13 +67,14 @@ transform: translateY(-3px);
 }
 
 
-header .auth {
+header #loginIcon {
 font-size: 24px;
 cursor: pointer;
 transition: color 0.3s ease, transform 0.3s ease;
+color: white;
 }
 
-header .auth:hover {
+#loginIcon:hover {
 color: #ffc107;
 transform: rotate(20deg);
 }
