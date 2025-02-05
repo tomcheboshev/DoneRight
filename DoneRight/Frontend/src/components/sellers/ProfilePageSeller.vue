@@ -1,6 +1,6 @@
 <script setup>
 import { ref } from "vue";
-import { useRouter } from "vue-router";  // Import Vue Router for navigation
+import { useRouter } from "vue-router";
 import PreloaderSection from "@/components/common/PreloaderSection.vue";
 
 const form = ref({
@@ -14,7 +14,7 @@ const form = ref({
   profilePicture: null,
 });
 
-const router = useRouter();  // Create router instance for navigation
+const router = useRouter();
 
 const handleFileChange = (event) => {
   const file = event.target.files[0];
@@ -23,15 +23,16 @@ const handleFileChange = (event) => {
   }
 };
 
+const removeProfilePicture = () => {
+  form.value.profilePicture = null; // Remove the picture, reset to default
+};
+
 const submitApplication = () => {
-  // Validation for matching passwords
   if (form.value.password !== form.value.confirmPassword) {
     alert("Passwords do not match!");
     return;
   }
-
-  // Redirect to the next form page
-  router.push("/next-form");  // Navigate to another page (adjust to your route)
+  router.push("/next-form");
 };
 
 const redirectToLogin = () => {
@@ -54,45 +55,53 @@ const redirectToLogin = () => {
           <div class="circle">
             <img :src="form.profilePicture || '/path/to/default-image.jpg'" alt="Profile" class="profile-img" />
           </div>
-          <button type="button" @click="$refs.profilePicInput.click()" class="add-profile-btn">Add Profile Picture</button>
-          <input type="file" ref="profilePicInput" @change="handleFileChange" accept="image/*" class="file-input" />
+
+          <!-- Add, Change or Remove Picture Buttons -->
+          <div class="button-group">
+            <button v-if="!form.profilePicture" type="button" @click="$refs.profilePicInput.click()" class="add-profile-btn">Add Profile Picture</button>
+            <div v-else class="profile-btns">
+              <button type="button" @click="$refs.profilePicInput.click()" class="change-profile-btn">Change Picture</button>
+              <button type="button" @click="removeProfilePicture" class="remove-profile-btn">Remove Picture</button>
+            </div>
+            <input type="file" ref="profilePicInput" @change="handleFileChange" accept="image/*" class="file-input" />
+          </div>
         </div>
 
         <!-- Name Section -->
         <div class="name-section">
           <div class="input-group">
-            <label for="firstName">First Name</label>
-            <input type="text" id="firstName" v-model="form.firstName" required placeholder="Enter your first name" />
+            <label for="firstName">Име</label>
+            <input type="text" id="firstName" v-model="form.firstName" required placeholder="Внеси име" />
           </div>
           <div class="input-group">
-            <label for="lastName">Last Name</label>
+            <label for="lastName">Презиме</label>
             <input type="text" id="lastName" v-model="form.lastName" required placeholder="Enter your last name" />
           </div>
         </div>
 
         <!-- Email and Phone -->
         <div class="input-group">
-          <label for="email">Email Address</label>
+          <label for="email">E-маил адреса</label>
           <input type="email" id="email" v-model="form.email" required placeholder="Enter your email address" />
         </div>
         <div class="input-group">
-          <label for="phone">Phone Number</label>
+          <label for="phone">Телефонски број</label>
           <input type="text" id="phone" v-model="form.phone" required placeholder="Enter your phone number" />
         </div>
 
         <!-- City Input -->
         <div class="input-group">
-          <label for="city">City</label>
-          <input type="text" id="city" v-model="form.city" required placeholder="Enter your city" />
+          <label for="city">Град / Општина</label>
+          <input type="text" id="city" v-model="form.city" required placeholder="Внеси град" />
         </div>
 
         <!-- Password and Confirm Password -->
         <div class="input-group">
-          <label for="password">Password</label>
+          <label for="password">Лозинка</label>
           <input type="password" id="password" v-model="form.password" required placeholder="Enter your password" />
         </div>
         <div class="input-group">
-          <label for="confirmPassword">Confirm Password</label>
+          <label for="confirmPassword">Потврди Лозинка</label>
           <input type="password" id="confirmPassword" v-model="form.confirmPassword" required placeholder="Confirm your password" />
         </div>
 
@@ -109,10 +118,10 @@ const redirectToLogin = () => {
 </template>
 
 <style scoped>
-/* Body Styling */
+/* Global Styles */
 body {
-  font-family: 'Roboto', sans-serif;
-  background: linear-gradient(45deg, #6a11cb, #2575fc);
+  font-family: 'Poppins', sans-serif;
+  background: linear-gradient(145deg, #6b0f1a, #b91372); /* Vibrant gradient background */
   background-attachment: fixed;
   margin: 0;
   padding: 0;
@@ -121,30 +130,49 @@ body {
   align-items: center;
   min-height: 100vh;
   color: #fff;
+  overflow: hidden;
+  position: relative;
+}
+
+/* Animated Background Layer */
+body::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(circle at 20% 20%, rgba(255, 255, 255, 0.1), rgba(0, 0, 0, 0.6));
+  opacity: 0.6;
+  z-index: -1;
 }
 
 /* Container Styling */
 .become-master-container {
   padding: 60px 50px;
-  background-color: rgba(255, 255, 255, 0.8);
-  border-radius: 20px;
+  background-color: rgba(255, 255, 255, 0.95);
+  border-radius: 25px;
   max-width: 900px;
-  margin: 30px auto;
-  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.1);
-  backdrop-filter: blur(10px);
-  transition: all 0.5s ease;
+  margin: 40px auto;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(15px);
+  animation: fadeInContainer 1s ease-out;
+  overflow: hidden;
+  position: relative;
 }
 
 /* Title Section */
 .title-section {
   text-align: center;
-  margin-bottom: 40px;
+  margin-bottom: 50px;
+  animation: fadeInTitle 1.5s ease-out;
 }
 
 .title-section h1 {
-  font-size: 40px;
+  font-size: 42px;
   font-weight: 700;
   color: #2a2a2a;
+  text-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1); /* Cool text shadow */
 }
 
 .subtitle {
@@ -152,6 +180,7 @@ body {
   color: #777;
   font-weight: 400;
   letter-spacing: 1px;
+  margin-top: 5px;
 }
 
 /* Form Container */
@@ -173,21 +202,28 @@ body {
 /* Profile Section */
 .profile-section {
   display: flex;
-  justify-content: flex-start;
+  flex-direction: column;
   align-items: center;
-  gap: 30px;
+  gap: 20px;
+  animation: slideIn 1s ease-out forwards;
 }
 
 .circle {
-  width: 130px;
-  height: 130px;
+  width: 140px;
+  height: 140px;
   border-radius: 50%;
   overflow: hidden;
-  background-color: #ddd;
-  border: 3px solid #4e73df;
+  background-color: #4e73df;
+  border: 4px solid #fff;
   display: flex;
   justify-content: center;
   align-items: center;
+  transition: all 0.3s ease;
+}
+
+.circle:hover {
+  border-color: #ff6a00;
+  transform: scale(1.1);
 }
 
 .profile-img {
@@ -197,37 +233,40 @@ body {
   border-radius: 50%;
 }
 
-.add-profile-btn {
-  background-color: #4e73df;
+/* Profile Picture Buttons */
+.button-group {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.profile-btns {
+  display: flex;
+  gap: 20px; /* Align buttons next to each other */
+}
+
+.add-profile-btn, .change-profile-btn, .remove-profile-btn {
+  background-color: #ff6a00;
   color: white;
-  padding: 12px 25px;
+  padding: 14px 28px;
   font-size: 16px;
   border-radius: 50px;
   cursor: pointer;
   border: none;
-  margin-top: 10px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
 }
 
-.add-profile-btn:hover {
-  background-color: #365a8a;
+.add-profile-btn:hover, .change-profile-btn:hover, .remove-profile-btn:hover {
+  background-color: #ee0979;
+  transform: translateY(-2px);
 }
 
 .file-input {
   display: none;
 }
 
-/* Name Section */
-.name-section {
-  display: flex;
-  gap: 30px;
-}
-
-.name-section .input-group {
-  flex: 1;
-}
-
-/* Input Group Styling */
+/* Input Styling */
 .input-group {
   display: flex;
   flex-direction: column;
@@ -246,6 +285,7 @@ body {
   border: 2px solid #ddd;
   border-radius: 10px;
   background-color: #f9f9f9;
+  transition: all 0.3s ease;
 }
 
 .input-group input:focus {
@@ -254,7 +294,7 @@ body {
   box-shadow: 0 0 8px rgba(78, 115, 223, 0.2);
 }
 
-/* Already have an account? Section */
+/* Link Styling */
 .account-link {
   text-align: center;
   font-size: 16px;
@@ -262,7 +302,7 @@ body {
 }
 
 .account-link .link {
-  color: #4e73df;
+  color: #ff6a00;
   cursor: pointer;
   font-weight: 600;
 }
@@ -274,7 +314,7 @@ body {
 /* Submit Button */
 .submit-btn {
   padding: 16px 28px;
-  background-color: #4e73df;
+  background-color: #ff6a00;
   color: white;
   font-size: 18px;
   font-weight: 600;
@@ -285,7 +325,7 @@ body {
 }
 
 .submit-btn:hover {
-  background-color: #365a8a;
+  background-color: #ee0979;
   transform: scale(1.05);
 }
 
@@ -293,8 +333,43 @@ body {
 @keyframes fadeInForm {
   0% {
     opacity: 0;
+    transform: translateY(20px);
   }
   100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInTitle {
+  0% {
+    opacity: 0;
+    transform: translateX(-30px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes fadeInContainer {
+  0% {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes slideIn {
+  0% {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(0);
     opacity: 1;
   }
 }
@@ -314,8 +389,8 @@ body {
   }
 
   .circle {
-    width: 110px;
-    height: 110px;
+    width: 120px;
+    height: 120px;
   }
 
   .add-profile-btn {

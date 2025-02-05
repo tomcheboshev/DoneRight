@@ -1,31 +1,44 @@
 <script setup>
 import { ref } from "vue";
+import { useRouter } from "vue-router";
 import img from "@/assets/lok.png";
 
+const router = useRouter();
+
 const services = ref([
-  { id: 1, name: "John", lastName: "Doe", job: "Electrician", image: img },
-  { id: 2, name: "Jane", lastName: "Smith", job: "Plumber", image: img },
-  { id: 3, name: "David", lastName: "Johnson", job: "Carpenter", image: img },
-  { id: 4, name: "Michael", lastName: "Brown", job: "Mechanic", image: img },
-  { id: 5, name: "Emily", lastName: "Clark", job: "Painter", image: img },
-  { id: 6, name: "Daniel", lastName: "Miller", job: "Roofer", image: img },
-  { id: 7, name: "Sarah", lastName: "White", job: "Gardener", image: img },
-  { id: 8, name: "James", lastName: "Lee", job: "Technician", image: img },
-  { id: 9, name: "Emma", lastName: "Walker", job: "Interior Designer", image: img },
-  { id: 10, name: "William", lastName: "Harris", job: "Architect", image: img },
+  { id: 1, name: "John", lastName: "Doe", job: "Electrician", image: img, description: "Expert in electrical wiring, installation, and repairs." },
+  { id: 2, name: "Jane", lastName: "Smith", job: "Plumber", image: img, description: "Professional plumber specializing in pipe installation and repairs." },
+  { id: 3, name: "David", lastName: "Johnson", job: "Carpenter", image: img, description: "Skilled carpenter with experience in furniture and home renovations." },
+  { id: 4, name: "Michael", lastName: "Brown", job: "Mechanic", image: img, description: "Certified auto mechanic with 10 years of experience." },
 ]);
 
 const favorites = ref([]);
+const showToast = ref(false);
 
 // Toggle favorite function
 const toggleFavorite = (service) => {
   const index = favorites.value.findIndex((fav) => fav.id === service.id);
   if (index === -1) {
     favorites.value.push(service);
+    showToastMessage();
   } else {
     favorites.value.splice(index, 1);
   }
   saveFavorites();
+};
+
+// Navigate to service details page
+const goToDetails = (service) => {
+  router.push({ 
+    path: `/service/${service.id}`, 
+    query: { 
+      name: service.name, 
+      lastName: service.lastName, 
+      job: service.job, 
+      description: service.description, 
+      image: service.image 
+    } 
+  });
 };
 
 // Check if a service is favorited
@@ -46,6 +59,14 @@ const loadFavorites = () => {
   }
 };
 
+// Show toast notification
+const showToastMessage = () => {
+  showToast.value = true;
+  setTimeout(() => {
+    showToast.value = false;
+  }, 1500);
+};
+
 loadFavorites();
 </script>
 
@@ -58,58 +79,47 @@ loadFavorites();
       <div class="info">
         <h3>{{ service.name }} {{ service.lastName }}</h3>
         <p class="job-title">{{ service.job }}</p>
-        <button class="contact-btn">Contact Me</button>
+        <button class="contact-btn" @click="goToDetails(service)">Contact Me</button>
         <button class="favorite-btn" @click="toggleFavorite(service)">
-          <span :class="{ favorite: isFavorite(service) }">⭐ {{ isFavorite(service) ? "Added to Favorites" : "Add to Favorites" }}</span>
+          <span :class="{ favorite: isFavorite(service) }">★</span>
         </button>
       </div>
     </div>
   </div>
+
+  <div v-if="showToast" class="toast">Added to Favorites</div>
 </template>
 
 <style scoped>
 /* ---- GRID LAYOUT ---- */
 .services-container {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 40px;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 30px;
   padding: 50px;
-  justify-content: center;
   max-width: 1400px;
   margin: auto;
 }
 
-@media (max-width: 1200px) {
-  .services-container {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-
-@media (max-width: 800px) {
-  .services-container {
-    grid-template-columns: 1fr;
-  }
-}
-
 /* ---- SERVICE CARD ---- */
 .service-card {
-  background: rgba(255, 255, 255, 0.15);
-  backdrop-filter: blur(20px);
-  border-radius: 20px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border-radius: 15px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
   overflow: hidden;
   display: flex;
   flex-direction: column;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
   padding: 20px;
   text-align: center;
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.3);
   position: relative;
 }
 
 .service-card:hover {
-  transform: translateY(-10px);
-  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
+  transform: translateY(-8px);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25);
 }
 
 /* ---- IMAGE STYLE ---- */
@@ -124,7 +134,7 @@ loadFavorites();
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transition: transform 0.3s ease-in-out;
+  transition: transform 0.4s ease-in-out;
 }
 
 .service-card:hover .profile-pic {
@@ -162,31 +172,53 @@ h3 {
 
 .contact-btn:hover {
   background: linear-gradient(135deg, #2e59d9, #1e3a8a);
-  box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.2);
+  box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.3);
 }
 
 /* ---- FAVORITE BUTTON ---- */
 .favorite-btn {
   background: none;
   border: none;
-  font-size: 16px;
-  font-weight: 600;
+  font-size: 24px;
   cursor: pointer;
-  padding: 10px;
-  border-radius: 30px;
-  transition: all 0.3s ease-in-out;
+  transition: color 0.3s ease-in-out, transform 0.2s ease;
 }
 
 .favorite-btn span {
-  color: #ffffff;
-  transition: color 0.3s ease-in-out;
+  color: white;
+  transition: color 0.3s ease-in-out, transform 0.2s ease;
 }
 
 .favorite-btn span.favorite {
   color: #f1c40f;
+  transform: scale(1.2);
 }
 
 .favorite-btn:hover span {
   color: #f1c40f;
+  transform: scale(1.1);
+}
+
+/* ---- TOAST NOTIFICATION ---- */
+.toast {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #4e73df;
+  color: white;
+  padding: 12px 20px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  opacity: 1;
+  animation: fadeOut 1.5s ease-in-out forwards;
+}
+
+@keyframes fadeOut {
+  0% { opacity: 1; }
+  70% { opacity: 1; }
+  100% { opacity: 0; }
 }
 </style>

@@ -1,18 +1,18 @@
 require("dotenv").config();
-import express, { json } from "express";
-import { createConnection } from "mysql";
-import { hash, compare } from "bcryptjs";
-import cors from "cors";
-import { sign } from "jsonwebtoken";
-import { urlencoded } from "body-parser";
+const express = require("express");
+const mysql = require("mysql");
+const bcrypt = require("bcryptjs");
+const cors = require("cors");
+const jwt = require("jsonwebtoken");
+const bodyParser = require("body-parser");
 
 const app = express();
 app.use(cors());
-app.use(json());
-app.use(urlencoded({ extended: true }));
+app.use(express.json());
+app.use(bodyParser.urlencoded({ extended: true }));
 
 // MySQL Connection
-const db = createConnection({
+const db = mysql.createConnection({
   host: "localhost",
   user: "root",
   password: "",
@@ -37,7 +37,7 @@ app.post("/register", async (req, res) => {
   }
 
   try {
-    const hashedPassword = await hash(password, 10);
+    const hashedPassword = await bcrypt.hash(password, 10);
 
     const sql = "INSERT INTO users (name, email, password) VALUES (?, ?, ?)";
     db.query(sql, [name, email, hashedPassword], (err, result) => {
@@ -69,13 +69,13 @@ app.post("/login", (req, res) => {
     }
 
     const user = results[0];
-    const passwordMatch = await compare(password, user.password);
+    const passwordMatch = await bcrypt.compare(password, user.password);
 
     if (!passwordMatch) {
       return res.status(401).json({ error: "Incorrect password!" });
     }
 
-    const token = sign({ id: user.id, email: user.email }, "secret", {
+    const token = jwt.sign({ id: user.id, email: user.email }, "secret", {
       expiresIn: "1h",
     });
 
