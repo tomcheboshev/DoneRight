@@ -7,13 +7,11 @@ import MobileAppSection from '@/components/common/MobileAppSection.vue';
 </script>
 
 <template>
-
     <DefaultLayout>
       <HeroSection />
       <CategoriesSection />
       <ApplySection />
       <MobileAppSection />
     </DefaultLayout>
-
 </template>
 

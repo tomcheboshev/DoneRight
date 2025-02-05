@@ -2,15 +2,6 @@
 import { RouterLink } from 'vue-router';
 
 </script>
-
-
-  <!-- <h1>Login</h1>
-  <input type="text" placeholder="email">
-  <input type="text" placeholder="password">
-  <RouterLink to="/register"><a href="">Forgotpass</a></RouterLink> -->
-  <!-- <RouterLink to="/register"><a rel="noopener noreferrer" href="#">Forgot Password ?</a></RouterLink> -->
-
-
   <template>
   <div class="auth-container">
     <div class="auth-card">
@@ -54,12 +45,33 @@ export default {
     };
   },
   methods: {
-    handleLogin() {
-      // Add your login logic here
-      console.log("Logging in with:", this.email, this.password);
-    },
+  async handleLogin() {
+    try {
+      const response = await fetch("http://localhost:5000/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email: this.email,
+          password: this.password,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        alert("Login successful!");
+        localStorage.setItem("token", data.token);
+        this.$router.push("/dashboard"); // Redirect to dashboard
+      } else {
+        alert(data.error);
+      }
+    } catch (error) {
+      console.error("Error logging in:", error);
+    }
   },
+},
 };
 </script>
-
 <style scoped src="@/assets/auth.css"></style>

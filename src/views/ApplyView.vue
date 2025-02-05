@@ -1,12 +1,11 @@
 <script setup>
-import DefaultLayout from '@/layouts/DefaultLayout.vue';
+import ProfilePageSeller from '@/components/sellers/ProfilePageSeller.vue';
 </script>
 
-<template>
- <DefaultLayout>
-  
- </DefaultLayout>
+<template setup>
+  <ProfilePageSeller />
 </template>
 
 <style scoped>
+  
 </style>

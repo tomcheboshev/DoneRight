@@ -1,22 +1,34 @@
 <script setup>
-import { RouterLink} from 'vue-router';
-import LogoImg from "@/assets/logo.png"
+import { ref } from "vue";
+import { RouterLink } from 'vue-router';
+import LogoImg from "@/assets/logo.png";
+
+// Simulating logged-in state (replace with actual authentication check)
+const isLoggedIn = ref(false);  // Set to true when the user is logged in
 </script>
 
 <template>
   <header>
+    <!-- Website logo always visible -->
     <div class="logo">
-      <img :src="LogoImg" alt="Logo">
+      <img :src="LogoImg" alt="Logo" />
     </div>
+
     <nav class="desktop-nav">
       <RouterLink to="/">Home</RouterLink>
       <RouterLink to="/services">Services</RouterLink>
-      <RouterLink to="/ourvision">Our Vision</RouterLink>
-      <RouterLink to="/apply">Become a Master</RouterLink>
+      <RouterLink v-if="isLoggedIn" to="/favourite">Favorites</RouterLink>
+      <RouterLink v-if="!isLoggedIn" to="/apply">Become a Master</RouterLink>
+      <RouterLink v-else to='/seller-dashboard'>Dashboard</RouterLink>
     </nav>
-    <div class="auth">
-      <RouterLink to="/login"><font-awesome-icon :icon="['fas', 'user']" id="loginIcon" /></RouterLink>
+
+    <!-- Conditionally show login icon when not logged in -->
+    <div v-if="isLoggedIn" class="auth">
+      <RouterLink to="/edit">
+        <font-awesome-icon :icon="['fas', 'user']" id="loginIcon" />
+      </RouterLink>
     </div>
+
     <div class="menu-icon">
       <font-awesome-icon :icon="['fas', 'bars']" />
     </div>
@@ -24,105 +36,110 @@ import LogoImg from "@/assets/logo.png"
 </template>
 
 <style scoped>
-
-
   header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 20px 40px;
-  background-color: #212529;
-  color: white;
-  position: sticky;
-  top: 0;
-  z-index: 1000;
-  font-size: 1.5rem; /* Increased font size */
-  
-}
-header .logo {
-  display: flex;
-  align-items: center;
-}
-header .logo img {
-  height: 50px;
-  transition: transform 0.3s ease;
-}
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 40px;
+    background-color: #212529;
+    color: white;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    font-size: 1.5rem;
+  }
 
-header .logo img:hover {
-transform: scale(1.1);
-}
-header nav {
-  display: flex;
-  gap: 20px;
-}
-header nav a {
-  color: white;
-  text-decoration: none;
-  font-weight: bold;
-  transition: color 0.3s;
-}
-header nav a:hover {
-color: #ffc107;
-transform: translateY(-3px);
-}
+  header .logo {
+    display: flex;
+    align-items: center;
+  }
 
+  header .logo img {
+    height: 50px;
+    transition: transform 0.3s ease;
+  }
 
-header #loginIcon {
-font-size: 24px;
-cursor: pointer;
-transition: color 0.3s ease, transform 0.3s ease;
-color: white;
-}
+  header .logo img:hover {
+    transform: scale(1.1);
+  }
 
-#loginIcon:hover {
-color: #ffc107;
-transform: rotate(20deg);
-}
+  header nav {
+    display: flex;
+    gap: 20px;
+  }
 
+  header nav a {
+    color: white;
+    text-decoration: none;
+    font-weight: bold;
+    transition: color 0.3s;
+  }
 
-.menu-icon {
-display: none;
-font-size: 28px;
-cursor: pointer;
-color: white;
-transition: color 0.3s ease, transform 0.3s ease;
-}
+  header nav a:hover {
+    color: #ffc107;
+    transform: translateY(-3px);
+  }
 
-.menu-icon:hover {
-color: #ffc107;
-transform: rotate(20deg);
-}
+  /* Auth Icon styling */
+  .auth {
+    display: flex;
+    align-items: center;
+  }
 
-@media (max-width: 768px) {
-header nav {
-display: none; /* Hide navigation for small screens */
-}
+  #loginIcon {
+    font-size: 24px;
+    cursor: pointer;
+    transition: color 0.3s ease, transform 0.3s ease;
+    color: white;
+  }
 
-.menu-icon {
-display: block;
-}
-}
+  #loginIcon:hover {
+    color: #ffc107;
+    transform: rotate(20deg);
+  }
 
-header nav.active {
-display: flex;
-flex-direction: column;
-background: rgba(0, 0, 0, 0.8); /* Semi-transparent background for mobile menu */
-padding: 10px;
-position: absolute;
-top: 60px;
-left: 0;
-width: 100%;
-}
+  .menu-icon {
+    display: none;
+    font-size: 28px;
+    cursor: pointer;
+    color: white;
+    transition: color 0.3s ease, transform 0.3s ease;
+  }
 
-header nav.active a {
-color: white;
-padding: 10px 20px;
-text-align: center;
-font-size: 1.2rem;
+  .menu-icon:hover {
+    color: #ffc107;
+    transform: rotate(20deg);
+  }
 
-}
+  @media (max-width: 768px) {
+    header nav {
+      display: none;
+    }
 
-header nav.active a:hover {
-color: #ffc107;
-}
+    .menu-icon {
+      display: block;
+    }
+  }
+
+  header nav.active {
+    display: flex;
+    flex-direction: column;
+    background: rgba(0, 0, 0, 0.8);
+    padding: 10px;
+    position: absolute;
+    top: 60px;
+    left: 0;
+    width: 100%;
+  }
+
+  header nav.active a {
+    color: white;
+    padding: 10px 20px;
+    text-align: center;
+    font-size: 1.2rem;
+  }
+
+  header nav.active a:hover {
+    color: #ffc107;
+  }
 </style>

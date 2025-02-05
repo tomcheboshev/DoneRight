@@ -1,5 +1,7 @@
 <script setup>
 import consImage from "@/assets/cons.png"
+import { useRouter } from "vue-router";
+const router = useRouter();
 </script>
 
 <template>
@@ -11,7 +13,7 @@ import consImage from "@/assets/cons.png"
                     <h1>Why Become a Master?</h1>
                 </div>
                 <p>Are you a skilled professional looking to grow your career and connect with more clients? Join our platform today and unlock a world of opportunities. Here's why you should apply:</p>
-                <button>Join now<font-awesome-icon :icon="['fas', 'arrow-right']" class="arrow-icon"/></button>
+                <button @click="router.push('/apply')">Join now<font-awesome-icon :icon="['fas', 'arrow-right']" class="arrow-icon"/></button>
             </div>
             <div class="right-content">
                 <img :src="consImage" alt="Professional Image" />

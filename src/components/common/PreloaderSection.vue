@@ -7,7 +7,7 @@ setTimeout(function () {
       
       // Trigger the page content to smoothly fade in
       document.querySelector('.hero').classList.add('visible'); // Add class to trigger smooth transition
-  }, 1500);
+  }, 1000);
 </script>
 
 <template>

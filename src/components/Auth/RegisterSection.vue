@@ -67,15 +67,39 @@ export default {
     };
   },
   methods: {
-    handleRegister() {
-      if (this.password !== this.confirmPassword) {
-        alert("Passwords do not match!");
-        return;
+  async handleRegister() {
+    if (this.password !== this.confirmPassword) {
+      alert("Passwords do not match!");
+      return;
+    }
+
+    try {
+      const response = await fetch("http://localhost:5000/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          name: this.name,
+          email: this.email,
+          password: this.password,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        alert("Registration successful!");
+        this.$router.push("/login");
+      } else {
+        alert(data.error);
       }
-      // Add your registration logic here
-      console.log("Registering with:", this.name, this.email, this.password);
-    },
+    } catch (error) {
+      console.error("Error registering:", error);
+    }
   },
+},
+
 };
 </script>
 
