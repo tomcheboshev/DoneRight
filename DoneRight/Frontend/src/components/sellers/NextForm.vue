@@ -115,7 +115,7 @@ const redirectToPreviousForm = () => {
         </div>
 
         <!-- Submit Button -->
-        <button type="submit" class="submit-btn">Submit Profile</button>
+        <button type="submit" @click="router.push('/success')" class="submit-btn">Submit Profile</button>
       </form>
 
       <button class="back-btn" @click="redirectToPreviousForm">Go Back</button>

@@ -9,6 +9,7 @@ import NextForm from '@/components/sellers/NextForm.vue';
 import EditProfile from '@/components/Auth/EditProfile.vue';
 import SellerDashboard from '@/components/sellers/SellerDashboard.vue';
 import ServiceDetails from '@/components/buyers/ServiceDetails.vue';
+import SuccessPage from '@/components/sellers/SuccessPage.vue';
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -23,6 +24,8 @@ const router = createRouter({
     { path: '/edit', component: EditProfile },
     { path: '/seller-dashboard', component: SellerDashboard },
     { path: '/service/:id', component: ServiceDetails },
+    { path: '/success', component: SuccessPage },
+
   ],
 });
 

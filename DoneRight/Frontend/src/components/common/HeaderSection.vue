@@ -4,7 +4,7 @@ import { RouterLink } from 'vue-router';
 import LogoImg from "@/assets/logo.png";
 
 // Simulating logged-in state (replace with actual authentication check)
-const isLoggedIn = ref(true);  // Set to true when the user is logged in
+const isLoggedIn = ref(false);  // Set to true when the user is logged in
 </script>
 
 <template>

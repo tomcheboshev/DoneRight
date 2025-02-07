@@ -1,11 +1,13 @@
 <script setup>
 import consImage from "@/assets/cons.png"
 import { useRouter } from "vue-router";
+import { ref } from "vue";
 const router = useRouter();
+const isLoggedIn = ref(false);
 </script>
 
 <template>
-    <section id="apply" class="apply-section">
+    <section v-if="!isLoggedIn" id="apply" class="apply-section">
         <div class="content">
             <div class="left-content">
                 <div class="header">
