@@ -1,7 +1,7 @@
 <script setup>
 import { ref } from "vue";
 import { useRouter } from "vue-router";
-import PreloaderSection from "@/components/common/PreloaderSection.vue";
+import DefaultProfilePicture from "@/assets/DefaultProfilePicture.jpg";
 
 const form = ref({
   firstName: "",
@@ -19,12 +19,12 @@ const router = useRouter();
 const handleFileChange = (event) => {
   const file = event.target.files[0];
   if (file) {
-    form.value.profilePicture = URL.createObjectURL(file); // Store the file for preview
+    form.value.profilePicture = URL.createObjectURL(file);
   }
 };
 
 const removeProfilePicture = () => {
-  form.value.profilePicture = null; // Remove the picture, reset to default
+  form.value.profilePicture = null;
 };
 
 const submitApplication = () => {
@@ -40,8 +40,9 @@ const redirectToLogin = () => {
 };
 </script>
 
+
 <template>
-  <PreloaderSection />
+  <div class="body">
   <div class="become-master-container">
     <div class="title-section">
       <h1>Become a Master</h1>
@@ -50,137 +51,155 @@ const redirectToLogin = () => {
 
     <div class="form-container">
       <form @submit.prevent="submitApplication" class="application-form">
+        
         <!-- Profile Picture Section -->
         <div class="profile-section">
           <div class="circle">
-            <img :src="form.profilePicture || '/path/to/default-image.jpg'" alt="Profile" class="profile-img" />
+            <img :src="form.profilePicture || DefaultProfilePicture" alt="Profile" class="profile-img" />
           </div>
-
-          <!-- Add, Change or Remove Picture Buttons -->
           <div class="button-group">
             <button v-if="!form.profilePicture" type="button" @click="$refs.profilePicInput.click()" class="add-profile-btn">Add Profile Picture</button>
             <div v-else class="profile-btns">
-              <button type="button" @click="$refs.profilePicInput.click()" class="change-profile-btn">Change Picture</button>
-              <button type="button" @click="removeProfilePicture" class="remove-profile-btn">Remove Picture</button>
+              <button type="button" @click="$refs.profilePicInput.click()" class="change-profile-btn">Change</button>
+              <button type="button" @click="removeProfilePicture" class="remove-profile-btn">Remove</button>
             </div>
             <input type="file" ref="profilePicInput" @change="handleFileChange" accept="image/*" class="file-input" />
           </div>
         </div>
 
-        <!-- Name Section -->
-        <div class="name-section">
+        <!-- Grid Layout for Input Fields -->
+        <div class="form-grid">
+          
+          <!-- First Name -->
+<!-- Grid Layout for First Name and Last Name -->
+<div class="name-section">
+  <!-- First Name -->
+  <div class="input-group">
+    <input type="text" id="firstName" v-model="form.firstName" required />
+    <label for="firstName">Име</label>
+  </div>
+
+  <!-- Last Name -->
+  <div class="input-group">
+    <input type="text" id="lastName" v-model="form.lastName" required />
+    <label for="lastName">Презиме</label>
+  </div>
+</div>
+
+          <!-- Phone -->
+          <div class="phone-city-section">
+  <div class="input-group">
+    <input type="text" id="phone" name="phone" required>
+    <label for="phone">Телефонски број</label>
+  </div>
+  <div class="input-group">
+    <input type="text" id="city" name="city" required>
+    <label for="city">Град / Општина</label>
+  </div>
+</div>
+
+          <!-- Email -->
+
+          <div class="ko">
           <div class="input-group">
-            <label for="firstName">Име</label>
-            <input type="text" id="firstName" v-model="form.firstName" required placeholder="Внеси име" />
+            <input type="email" id="email" v-model="form.email" required />
+            <label for="email">Емајл</label>
           </div>
+
           <div class="input-group">
-            <label for="lastName">Презиме</label>
-            <input type="text" id="lastName" v-model="form.lastName" required placeholder="Enter your last name" />
-          </div>
-        </div>
+    <input type="text" id="city" name="city" required>
+    <label for="city">Адреса</label>
+  </div>
+</div>
 
-        <!-- Email and Phone -->
-        <div class="input-group">
-          <label for="email">E-маил адреса</label>
-          <input type="email" id="email" v-model="form.email" required placeholder="Enter your email address" />
-        </div>
-        <div class="input-group">
-          <label for="phone">Телефонски број</label>
-          <input type="text" id="phone" v-model="form.phone" required placeholder="Enter your phone number" />
-        </div>
+          
 
-        <!-- City Input -->
-        <div class="input-group">
-          <label for="city">Град / Општина</label>
-          <input type="text" id="city" v-model="form.city" required placeholder="Внеси град" />
-        </div>
 
-        <!-- Password and Confirm Password -->
-        <div class="input-group">
-          <label for="password">Лозинка</label>
-          <input type="password" id="password" v-model="form.password" required placeholder="Enter your password" />
+
+          <div class="password-section">
+          <!-- Password -->
+          <div class="input-group">
+    <input type="password" id="password" v-model="form.password" required />
+    <label for="password">Лозинка</label>
+  </div>
+
+          <!-- Confirm Password -->
+          <div class="input-group">
+    <input type="password" id="confirmPassword" v-model="form.confirmPassword" required />
+    <label for="confirmPassword">Потврди лозинка</label>
+  </div>
         </div>
-        <div class="input-group">
-          <label for="confirmPassword">Потврди Лозинка</label>
-          <input type="password" id="confirmPassword" v-model="form.confirmPassword" required placeholder="Confirm your password" />
-        </div>
+      </div>
+
+        
 
         <!-- Already have an account? Link -->
         <div class="account-link">
           <p>Already have an account? <span @click="redirectToLogin" class="link">Login here</span></p>
         </div>
 
-        <!-- Continue Button -->
+        <!-- Submit Button -->
         <button type="submit" class="submit-btn">Continue</button>
       </form>
     </div>
   </div>
+</div>
 </template>
 
 <style scoped>
 /* Global Styles */
-body {
+
+/* Global Styles */
+.body {
   font-family: 'Poppins', sans-serif;
-  background: linear-gradient(145deg, #6b0f1a, #b91372); /* Vibrant gradient background */
-  background-attachment: fixed;
+  background-color: #283242;
   margin: 0;
   padding: 0;
   display: flex;
   justify-content: center;
   align-items: center;
   min-height: 100vh;
-  color: #fff;
   overflow: hidden;
   position: relative;
 }
 
-/* Animated Background Layer */
-body::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: radial-gradient(circle at 20% 20%, rgba(255, 255, 255, 0.1), rgba(0, 0, 0, 0.6));
-  opacity: 0.6;
-  z-index: -1;
-}
-
 /* Container Styling */
 .become-master-container {
-  padding: 60px 50px;
-  background-color: rgba(255, 255, 255, 0.95);
-  border-radius: 25px;
-  max-width: 900px;
-  margin: 40px auto;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-  backdrop-filter: blur(15px);
+  padding: 30px 20px; /* Further reduced padding */
+  background-color: #ffffff;
+  border-radius: 15px;
+  max-width: 550px; /* Decreased max width */
+  margin: 20px auto; /* Adjusted margin */
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(10px);
   animation: fadeInContainer 1s ease-out;
   overflow: hidden;
   position: relative;
 }
 
+@media (max-width: 768px) {
+  .become-master-container {
+    padding: 20px 10px; /* Further reduce padding on small screens */
+    max-width: 85%; /* Make it responsive */
+  }
+}
 /* Title Section */
 .title-section {
   text-align: center;
-  margin-bottom: 50px;
-  animation: fadeInTitle 1.5s ease-out;
 }
 
 .title-section h1 {
   font-size: 42px;
   font-weight: 700;
-  color: #2a2a2a;
-  text-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1); /* Cool text shadow */
+  color: #4a90e2;
+  text-shadow: 2px 2px 8px rgba(74, 144, 226, 0.2);
 }
 
 .subtitle {
   font-size: 18px;
-  color: #777;
+  color: #6c757d;
   font-weight: 400;
   letter-spacing: 1px;
-  margin-top: 5px;
 }
 
 /* Form Container */
@@ -188,7 +207,7 @@ body::before {
   background-color: #ffffff;
   padding: 30px 40px;
   border-radius: 15px;
-  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
   opacity: 0;
   animation: fadeInForm 1.5s ease-out forwards;
 }
@@ -196,25 +215,24 @@ body::before {
 .application-form {
   display: flex;
   flex-direction: column;
-  gap: 25px;
+  gap: 20px;
 }
 
-/* Profile Section */
 .profile-section {
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 20px;
-  animation: slideIn 1s ease-out forwards;
 }
 
+/* Ensure profile picture stays on the left */
 .circle {
-  width: 140px;
-  height: 140px;
+  flex-shrink: 0; /* Prevents shrinking */
+  width: 120px;
+  height: 120px;
   border-radius: 50%;
   overflow: hidden;
-  background-color: #4e73df;
-  border: 4px solid #fff;
+  border: 4px solid #777;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -222,15 +240,8 @@ body::before {
 }
 
 .circle:hover {
-  border-color: #ff6a00;
-  transform: scale(1.1);
-}
+  border-color: #007bff;
 
-.profile-img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  border-radius: 50%;
 }
 
 /* Profile Picture Buttons */
@@ -242,67 +253,162 @@ body::before {
 
 .profile-btns {
   display: flex;
-  gap: 20px; /* Align buttons next to each other */
+  flex-direction: row;
+  gap: 10px;
 }
 
-.add-profile-btn, .change-profile-btn, .remove-profile-btn {
-  background-color: #ff6a00;
+.add-profile-btn, 
+.change-profile-btn, 
+.remove-profile-btn {
+  background-color: #007bff;
   color: white;
-  padding: 14px 28px;
-  font-size: 16px;
+  padding: 12px 24px;
+  font-size: 15px;
   border-radius: 50px;
   cursor: pointer;
   border: none;
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
   transition: all 0.3s ease;
 }
 
-.add-profile-btn:hover, .change-profile-btn:hover, .remove-profile-btn:hover {
-  background-color: #ee0979;
-  transform: translateY(-2px);
+.add-profile-btn:hover, 
+.change-profile-btn:hover, 
+.remove-profile-btn:hover {
+  background-color: #0056b3;
 }
 
 .file-input {
   display: none;
 }
 
-/* Input Styling */
-.input-group {
-  display: flex;
-  flex-direction: column;
+/* Responsive Fix for Small Screens */
+@media (max-width: 768px) {
+  .profile-section {
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .circle{
+    height: 110px;
+    width: 110px;
+  }
+
+  .profile-section .profile-btns {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 10px;
+  }
+
+  .add-profile-btn, .change-profile-btn, .remove-profile-btn {
+    width: 100%;
+    font-size: 14px;
+    padding: 10px 16px;
+  }
 }
 
-.input-group label {
-  font-size: 16px;
-  color: #333;
-  margin-bottom: 8px;
-  font-weight: 600;
+.file-input {
+  display: none;
 }
+
+/* Name Section */
+.name-section {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+/* Input Group */
+.input-group {
+  position: relative;
+  margin-bottom: 13px;
+  width: 83%;
+}
+
+.input-group#email{
+  width: 90%;
+}
+
+.phone-city-section {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.ko{
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+/* Password and Confirm Password Section */
+.password-section {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .password-section {
+    grid-template-columns: 1fr;
+    gap: 0px;
+  }
+
+  .ko{
+    grid-template-columns: 1fr;
+    gap: 0px;
+  }
+}
+
 
 .input-group input {
-  padding: 14px;
+  padding: 16px;
   font-size: 16px;
-  border: 2px solid #ddd;
-  border-radius: 10px;
-  background-color: #f9f9f9;
+  border: 2px solid #ccc;
+  border-radius: 8px;
+  background-color: #fff;
+  width: 100%;
   transition: all 0.3s ease;
 }
 
 .input-group input:focus {
-  outline: none;
-  border-color: #4e73df;
-  box-shadow: 0 0 8px rgba(78, 115, 223, 0.2);
+  border-color: #000000;
+  background-color: white;
+  box-shadow: 0 0 5px rgba(245, 0, 0, 0.9);
 }
 
-/* Link Styling */
+/* Floating Label */
+.input-group label {
+  position: absolute;
+  top: 50%;
+  left: 16px;
+  transform: translateY(-50%);
+  font-size: 16px;
+  color: #777;
+  pointer-events: none;
+  transition: all 0.3s ease;
+  background-color: white;
+  padding: 0 5px;
+}
+
+/* When input is focused or has content, move label up */
+.input-group input:focus + label,
+.input-group input:valid + label {
+  top: 0.01px;
+  left: 14px;
+  font-size: 12px;
+  color: #777;
+}
+
+/* Account Link */
 .account-link {
   text-align: center;
   font-size: 16px;
-  margin-bottom: 20px;
 }
 
 .account-link .link {
-  color: #ff6a00;
+  color: #007bff;
   cursor: pointer;
   font-weight: 600;
 }
@@ -311,10 +417,17 @@ body::before {
   text-decoration: underline;
 }
 
+.profile-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+}
+
 /* Submit Button */
 .submit-btn {
   padding: 16px 28px;
-  background-color: #ff6a00;
+  background-color: #007bff;
   color: white;
   font-size: 18px;
   font-weight: 600;
@@ -325,7 +438,7 @@ body::before {
 }
 
 .submit-btn:hover {
-  background-color: #ee0979;
+  background-color: #0056b3;
   transform: scale(1.05);
 }
 
@@ -341,21 +454,10 @@ body::before {
   }
 }
 
-@keyframes fadeInTitle {
-  0% {
-    opacity: 0;
-    transform: translateX(-30px);
-  }
-  100% {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
-
 @keyframes fadeInContainer {
   0% {
     opacity: 0;
-    transform: scale(0.9);
+    transform: scale(0.95);
   }
   100% {
     opacity: 1;
@@ -363,39 +465,42 @@ body::before {
   }
 }
 
-@keyframes slideIn {
-  0% {
-    transform: translateY(20px);
-    opacity: 0;
-  }
-  100% {
-    transform: translateY(0);
-    opacity: 1;
-  }
-}
-
 /* Responsive Design */
 @media (max-width: 768px) {
+  .name-section {
+    grid-template-columns: 1fr;
+    gap: 0px;
+  }
+
+  .profile-btns {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .add-profile-btn, .change-profile-btn, .remove-profile-btn {
+    width: 100%;
+    font-size: 14px;
+    padding: 10px 16px;
+  }
+
   .become-master-container {
-    padding: 40px 30px;
+    padding: 10px 30px;
+  }
+
+  .input-group label {
+    font-size: 14px;
   }
 
   .input-group input {
-    width: 100%;
-  }
-
-  .name-section {
-    flex-direction: column;
-  }
-
-  .circle {
-    width: 120px;
-    height: 120px;
-  }
-
-  .add-profile-btn {
     font-size: 14px;
-    padding: 10px 20px;
+    padding: 12px;
+  }
+
+  .phone-city-section {
+    grid-template-columns: 1fr;
+    gap: 0px;
   }
 }
+
+
 </style>
