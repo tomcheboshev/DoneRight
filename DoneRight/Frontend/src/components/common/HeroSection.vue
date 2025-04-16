@@ -1,131 +1,154 @@
 <script setup>
-
 </script>
 
 <template>
-    <section class="hero" id="hero">
-        <div class="hero-content">
-            <h1>Find the Perfect Master <br> for any Job, Anytime.</h1>
-            <div class="search-bar">
-                <input type="text" placeholder="What service do you need?" id="searchInput">
-                <button>
-                  <font-awesome-icon :icon="['fas', 'search']" class="button-icon"/>
-                </button>
-            </div>
-        </div>
-        <div class="hero-image"></div>
-        <div class="wave">
-            <svg viewBox="0 0 1200 160" preserveAspectRatio="none">
-                <path d="M0,120 C320,200 800,40 1200,160 L1200,200 L0,200 Z" fill="#565b61"></path>
-            </svg>
-        </div>
-    </section>
+  <section class="hero" id="hero">
+    <div class="hero-overlay"></div>
+    <div class="hero-content">
+      <h1>Најди го најдобриот мајстор за било што, било кога.</h1>
+      <p class="subtitle">Поврзуваме професионалци со муштерии со само неколку клика.</p>
+      <button class="explore-btn">Побарај</button>
+    </div>
+    <div class="wave">
+      <svg viewBox="0 0 1440 320">
+        <path fill="url(#waveGradient)" fill-opacity="1" d="M0,96L60,117.3C120,139,240,181,360,186.7C480,192,600,160,720,133.3C840,107,960,85,1080,106.7C1200,128,1320,192,1380,224L1440,256L1440,320L1380,320C1320,320,1200,320,1080,320C960,320,840,320,720,320C600,320,480,320,360,320C240,320,120,320,60,320L0,320Z"></path>
+        <defs>
+          <linearGradient id="waveGradient" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="#ffc107"/>
+            <stop offset="100%" stop-color="#ad8409"/>
+          </linearGradient>
+        </defs>
+      </svg>
+    </div>
+  </section>
 </template>
 
 <style scoped>
+/* HERO SECTION */
 .hero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
   text-align: center;
   padding: 200px 20px;
-  background-color: #212529;
+  background: #212529;
   color: white;
   position: relative;
-  opacity: 0;
-  transform: translateY(20px);
-  transition: opacity 1.5s ease-out, transform 1.5s ease-out; /* Smooth opacity and translation */
-  background: 
-    linear-gradient(to left, #212529, #212529), 
-    url('majstor-01.png') no-repeat left center, /* Add image on the left */
-    url('majstor-02.png') no-repeat right center; /* Add image on the right */
-  background-size: contain, contain, contain; /* Ensure images fit nicely */
-  background-blend-mode: overlay; /* Apply transparency to both images */
+  overflow: hidden;
 }
 
-.hero.visible {
-  opacity: 1;
-  transform: translateY(0);
+/* Позадински ефект */
+.hero-overlay {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.3);
+
+}
+
+/* КОНТЕНТ - ТЕКСТ И КОПЧЕ */
+.hero-content {
+  max-width: 800px;
+  z-index: 2;
+  animation: zoomFadeIn 1.5s ease-in-out;
 }
 
 .hero h1 {
   font-size: 4rem;
-  margin-bottom: 100px;
-  margin-top: -20px;
+  font-weight: bold;
+  margin-bottom: 20px;
+  text-shadow: 3px 3px 15px rgba(255, 193, 7, 0.5);
+  animation: textGlow 2s infinite alternate;
 }
 
-.hero .search-bar {
-  display: flex;
-  max-width: 800px;
-  margin: 50px auto 0;
-  background: white;
-  border-radius: 30px;
-  overflow: hidden;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  transition: transform 0.3s ease-in-out; /* Added animation */
+.subtitle {
+  font-size: 1.5rem;
+  opacity: 0.9;
+  margin-bottom: 40px;
+  animation: fadeIn 1.5s ease-in-out;
 }
 
-.hero .search-bar:hover {
-  transform: scale(1.05); /* Zooms on hover */
-}
-
-.hero .search-bar input {
-  flex: 1;
-  padding: 15px 20px;
-  border: none;
-  outline: none;
-  font-size: 1.2rem;
-}
-
-.hero .search-bar button {
-  background: #ffc107;
+/* Копче */
+.explore-btn {
+  background: linear-gradient(135deg, #ffc107, #ad8409);
   color: white;
+  font-size: 1.5rem;
+  padding: 15px 40px;
+  border-radius: 30px;
   border: none;
-  padding: 15px 20px;
-  font-size: 1.2rem;
-  cursor: pointer; /* Ensures pointer cursor */
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+  transition: transform 0.3s ease-in-out, box-shadow 0.3s, background 0.3s;
+  animation: pulseGlow 1.5s infinite alternate;
 }
 
-.hero .search-bar button:hover {
-  background: #ad8409;
+.explore-btn:hover {
+  transform: scale(1.1);
+  box-shadow: 0 15px 30px rgba(255, 193, 7, 0.4);
+  background: linear-gradient(135deg, #ffdd33, #c8950a);
 }
 
-.button-icon {
-  font-size: 1.5rem; /* Larger icon */
+
+
+/* --- Анимации --- */
+@keyframes zoomFadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 
-.wave {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  overflow: hidden;
-  line-height: 0;
-  height: 200px; /* Adjust height as needed */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
-.wave svg {
-  display: block;
-  width: 100%;
-  height: 100%; /* Ensures it fills the container */
+@keyframes textGlow {
+  from {
+    text-shadow: 3px 3px 15px rgba(255, 193, 7, 0.4);
+  }
+  to {
+    text-shadow: 5px 5px 25px rgba(255, 193, 7, 0.6);
+  }
 }
 
+@keyframes pulseGlow {
+  from {
+    box-shadow: 0 10px 20px rgba(255, 193, 7, 0.3);
+  }
+  to {
+    box-shadow: 0 15px 30px rgba(255, 193, 7, 0.5);
+  }
+}
+
+/* RESPONSIVE */
 @media (max-width: 768px) {
   .hero {
-    background: 
-      linear-gradient(to left, rgba(33, 37, 41, 0.8), rgba(33, 37, 41, 0.8)), 
-      url('majstor-03.png') no-repeat center center; /* Show only one image */
-    background-size: auto 90%, cover; /* Scale the single image nicely */
-    padding: 150px 10px; /* Adjust padding */
+    padding: 150px 10px;
   }
 
   .hero h1 {
-    font-size: 2.5rem; /* Reduce text size for smaller screens */
-    margin-bottom: 50px;
+    font-size: 2.8rem;
   }
 
-  .hero .search-bar {
-    max-width: 90%; /* Ensure the search bar fits smaller screens */
+  .subtitle {
+    font-size: 1.2rem;
+  }
+
+  .explore-btn {
+    font-size: 1.2rem;
+    padding: 12px 30px;
   }
 }
 </style>

@@ -1,130 +1,228 @@
 <template>
-  <div class="container">
-    <!-- Title Section -->
-    <div class="title">
-      <h1>Our Service Providers</h1>
-      <p class="subtitle">Find the best professionals near you</p>
-    </div>
+  <div class="background">
+    <div class="overlay"></div>
 
-    <!-- Input Fields for Searching Services and City -->
-    <div class="inputs-container">
-      <input
-        type="text"
-        placeholder="Search for Services..."
-        v-model="searchService"
-        class="filter-input"
-      />
-      <input
-        type="text"
-        placeholder="Enter City..."
-        v-model="searchCity"
-        class="filter-input"
-      />
-    </div>
+    <div class="container">
+      <!-- Title Section -->
+      <div class="title">
+        <h1>Најди Мајстор</h1>
+        <p class="subtitle">Пронајди најдобрите професионалци во твојот град</p>
+      </div>
 
-    <!-- Service cards would go here later -->
+      <!-- Input Fields -->
+      <div class="inputs-container">
+        <!-- Service Dropdown -->
+        <div class="input-group">
+          <input
+            type="text"
+            id="service"
+            v-model="searchService"
+            @input="filterServices"
+            @focus="showServiceDropdown = true"
+            @blur="hideDropdown('service')"
+            placeholder="Пребарај услуга..."
+          />
+          <transition name="fade">
+            <ul v-if="showServiceDropdown" class="dropdown">
+              <li v-for="service in filteredServices" :key="service" @mousedown="selectService(service)">
+                {{ service }}
+              </li>
+            </ul>
+          </transition>
+        </div>
+
+        <!-- City Dropdown -->
+        <div class="input-group">
+          <input
+            type="text"
+            id="city"
+            v-model="searchCity"
+            @input="filterCities"
+            @focus="showCityDropdown = true"
+            @blur="hideDropdown('city')"
+            placeholder="Внеси град..."
+          />
+          <transition name="fade">
+            <ul v-if="showCityDropdown" class="dropdown">
+              <li v-for="city in filteredCities" :key="city" @mousedown="selectCity(city)">
+                {{ city }}
+              </li>
+            </ul>
+          </transition>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
 <script setup>
 import { ref } from "vue";
 
-const searchService = ref('');
-const searchCity = ref('');
+const searchService = ref("");
+const searchCity = ref("");
+const showServiceDropdown = ref(false);
+const showCityDropdown = ref(false);
+
+const services = ["Електричар", "Водоводџија", "Молер", "Градинар", "Керамичар"];
+const cities = ["Скопје", "Битола", "Куманово", "Охрид", "Штип"];
+
+const filteredServices = ref([...services]);
+const filteredCities = ref([...cities]);
+
+const filterServices = () => {
+  filteredServices.value = searchService.value
+    ? services.filter((service) => service.toLowerCase().startsWith(searchService.value.toLowerCase()))
+    : [...services];
+};
+
+const filterCities = () => {
+  filteredCities.value = searchCity.value
+    ? cities.filter((city) => city.toLowerCase().startsWith(searchCity.value.toLowerCase()))
+    : [...cities];
+};
+
+const selectService = (service) => {
+  searchService.value = service;
+  showServiceDropdown.value = false;
+};
+
+const selectCity = (city) => {
+  searchCity.value = city;
+  showCityDropdown.value = false;
+};
+
+const hideDropdown = (type) => {
+  setTimeout(() => {
+    if (type === "service") showServiceDropdown.value = false;
+    if (type === "city") showCityDropdown.value = false;
+  }, 200);
+};
 </script>
 
 <style scoped>
-/* Overall container to center the content */
+/* Background & Container */
+.background {
+  position: relative;
+  width: 100%;
+  height: 50vh;
+  background: linear-gradient(135deg, #0d0d0d, #1a1a1a);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.overlay {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(6px);
+}
+
 .container {
-  padding: 50px 60px;
-  background-color: #ffffff;
-  border-radius: 20px;
-  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.1);
-  max-width: 900px;
-  margin: 40px auto 0 auto; /* Added margin-top for spacing */
+  position: relative;
+  background-color: #212529;
+  border-radius: 15px;
+  padding: 40px;
+  max-width: 750px;
+  width: 90%;
   text-align: center;
-  font-family: "Arial", sans-serif;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
 }
 
-/* Title Section */
-.title {
-  margin-bottom: 30px;
-}
-
+/* Title */
 .title h1 {
-  font-size: 40px;
-  font-weight: 800;
-  color: #333;
-  text-transform: uppercase;
-  letter-spacing: 2px;
-  margin-bottom: 10px;
+  font-size: 32px;
+  font-weight: 700;
+  color: #ffcc00;
 }
 
 .subtitle {
-  font-size: 18px;
-  color: #777;
+  font-size: 16px;
+  color: #ddd;
   margin-top: 5px;
-  font-weight: 400;
 }
 
-/* Container for Inputs */
+/* Inputs */
 .inputs-container {
   display: flex;
-  gap: 20px;
+  flex-wrap: wrap;
+  gap: 15px;
   justify-content: center;
-  margin-bottom: 50px;
+  margin-top: 20px;
 }
 
-/* Input Fields Styling */
-.filter-input {
-  padding: 16px 24px;
+.input-group {
+  position: relative;
+  width: 90%;
+  max-width: 350px;
+}
+
+.input-group input {
+  width: 90%;
+  padding: 14px;
   font-size: 16px;
-  border-radius: 30px;
-  border: 1px solid #ddd;
-  width: 350px;
-  max-width: 100%;
-  background-color: #fafafa;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08);
-  transition: all 0.3s ease;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+  border: 2px solid transparent;
+  transition: all 0.3s ease-in-out;
 }
 
-.filter-input::placeholder {
-  color: #aaa;
-  font-weight: 300;
-}
-
-/* Hover and Focus Effects for Inputs */
-.filter-input:hover {
-  border-color: #4e73df;
-  box-shadow: 0 4px 10px rgba(78, 115, 223, 0.2);
-}
-
-.filter-input:focus {
+.input-group input:focus {
+  background: rgba(255, 255, 255, 0.2);
   outline: none;
-  border-color: #4e73df;
-  box-shadow: 0 0 10px rgba(78, 115, 223, 0.3);
+  border-color: #ffcc00;
+  box-shadow: 0 0 12px rgba(255, 204, 0, 0.6);
 }
 
-/* Responsive Design for Small Screens */
+/* Dropdown */
+.dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 90%;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(8px);
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  max-height: 180px;
+  overflow-y: auto;
+  z-index: 10;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+.dropdown li {
+  padding: 12px;
+  cursor: pointer;
+  color: white;
+  list-style: none;
+  transition: 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.dropdown li:hover {
+  background: rgba(255, 204, 0, 0.3);
+}
+
+/* Animations */
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.3s ease;
+}
+
+.fade-enter, .fade-leave-to {
+  opacity: 0;
+}
+
+/* Responsive */
 @media (max-width: 768px) {
-  .inputs-container {
-    flex-direction: column;
-    align-items: center;
-  }
-
-  .filter-input {
-    width: 100%;
-    max-width: 500px;
-  }
-}
-
-@media (max-width: 480px) {
-  .title h1 {
-    font-size: 32px;
-  }
-
-  .subtitle {
-    font-size: 16px;
+  .container {
+    width: 80%;
   }
 }
 </style>

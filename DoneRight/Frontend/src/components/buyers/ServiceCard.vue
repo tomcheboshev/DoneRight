@@ -1,131 +1,211 @@
+<template>
+  <div>
+    <!-- Search Section -->
+    <div class="background">
+      <div class="overlay"></div>
+
+      <div class="container">
+        <!-- Title Section -->
+        <div class="title">
+          <h1>Најди Мајстор</h1>
+          <p class="subtitle">Пронајди најдобрите професионалци во твојот град</p>
+        </div>
+
+        <!-- Input Fields -->
+        <div class="inputs-container">
+          <!-- Service Dropdown -->
+          <div class="input-group">
+            <input
+              type="text"
+              id="service"
+              v-model="searchService"
+              @input="filterServices"
+              @focus="showServiceDropdown = true"
+              @blur="hideDropdown('service')"
+              placeholder="Пребарај услуга..."
+            />
+            <transition name="fade">
+              <ul v-if="showServiceDropdown" class="dropdown">
+                <li v-for="service in filteredServices" :key="service" @mousedown="selectService(service)">
+                  {{ service }}
+                </li>
+              </ul>
+            </transition>
+          </div>
+
+          <!-- City Dropdown -->
+          <div class="input-group">
+            <input
+              type="text"
+              id="city"
+              v-model="searchCity"
+              @input="filterCities"
+              @focus="showCityDropdown = true"
+              @blur="hideDropdown('city')"
+              placeholder="Внеси град..."
+            />
+            <transition name="fade">
+              <ul v-if="showCityDropdown" class="dropdown">
+                <li v-for="city in filteredCities" :key="city" @mousedown="selectCity(city)">
+                  {{ city }}
+                </li>
+              </ul>
+            </transition>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Service Cards Section -->
+    <div class="services-container">
+      <div v-for="service in filteredServicesList" :key="service.id" class="service-card">
+        <div class="image-container">
+          <img :src="service.image" :alt="`${service.name} ${service.lastName}`" class="profile-pic" />
+        </div>
+
+        <div class="info">
+          <h3>{{ service.name }} {{ service.lastName }}</h3>
+          <p class="job-title">
+            <span class="job-badge">{{ getJobIcon(service.job) }}</span>
+            {{ service.job }}
+          </p>
+          <p class="location">📍 {{ service.location }}</p>
+          <p class="rating">⭐ {{ service.rating }}/5</p>
+
+          <div class="btn-container">
+            <button class="contact-btn" @click="goToDetails(service)">Контактирај ме</button>
+            <button class="favorite-btn" @click="toggleFavorite(service)">
+              <span :class="{ favorite: isFavorite(service) }">★</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
 <script setup>
-import { ref } from "vue";
+import { ref, computed } from "vue";
 import { useRouter } from "vue-router";
 import img from "@/assets/lok.png";
 
-const router = useRouter();
+// Search Logic
+const searchService = ref("");
+const searchCity = ref("");
+const showServiceDropdown = ref(false);
+const showCityDropdown = ref(false);
 
+const servicesList = ["Електричар", "Водоводџија", "Молер", "Градинар", "Керамичар"];
+const citiesList = ["Скопје", "Битола", "Куманово", "Охрид", "Штип"];
+
+const filteredServices = ref([...servicesList]);
+const filteredCities = ref([...citiesList]);
+
+const filterServices = () => {
+  filteredServices.value = searchService.value
+    ? servicesList.filter((service) => service.toLowerCase().startsWith(searchService.value.toLowerCase()))
+    : [...servicesList];
+};
+
+const filterCities = () => {
+  filteredCities.value = searchCity.value
+    ? citiesList.filter((city) => city.toLowerCase().startsWith(searchCity.value.toLowerCase()))
+    : [...citiesList];
+};
+
+const selectService = (service) => {
+  searchService.value = service;
+  showServiceDropdown.value = false;
+};
+
+const selectCity = (city) => {
+  searchCity.value = city;
+  showCityDropdown.value = false;
+};
+
+const hideDropdown = (type) => {
+  setTimeout(() => {
+    if (type === "service") showServiceDropdown.value = false;
+    if (type === "city") showCityDropdown.value = false;
+  }, 200);
+};
+
+// Service Cards Logic
+const router = useRouter();
 const services = ref([
-  { id: 1, name: "John", lastName: "Doe", job: "Electrician", image: img, description: "Expert in electrical wiring, installation, and repairs." },
-  { id: 2, name: "Jane", lastName: "Smith", job: "Plumber", image: img, description: "Professional plumber specializing in pipe installation and repairs." },
-  { id: 3, name: "David", lastName: "Johnson", job: "Carpenter", image: img, description: "Skilled carpenter with experience in furniture and home renovations." },
-  { id: 4, name: "Michael", lastName: "Brown", job: "Mechanic", image: img, description: "Certified auto mechanic with 10 years of experience." },
+  { id: 1, name: "John", lastName: "Doe", job: "Електричар", location: "Скопје", rating: 4.8, image: img },
+  { id: 2, name: "Томче", lastName: "Бошев", job: "Електричар", location: "Битола", rating: 4.5, image: img },
+  { id: 3, name: "David", lastName: "Johnson", job: "Дрводелец", location: "Прилеп", rating: 4.7, image: img },
+  { id: 4, name: "Michael", lastName: "Brown", job: "Механичар", location: "Куманово", rating: 4.6, image: img },
 ]);
 
 const favorites = ref([]);
-const showToast = ref(false);
 
-// Toggle favorite function
 const toggleFavorite = (service) => {
   const index = favorites.value.findIndex((fav) => fav.id === service.id);
   if (index === -1) {
     favorites.value.push(service);
-    showToastMessage();
   } else {
     favorites.value.splice(index, 1);
   }
-  saveFavorites();
 };
 
-// Navigate to service details page
 const goToDetails = (service) => {
-  router.push({ 
-    path: `/service/${service.id}`, 
-    query: { 
-      name: service.name, 
-      lastName: service.lastName, 
-      job: service.job, 
-      description: service.description, 
-      image: service.image 
-    } 
+  router.push({ path: `/service/${service.id}` });
+};
+
+const isFavorite = (service) => favorites.value.some((fav) => fav.id === service.id);
+
+const getJobIcon = (job) => {
+  const icons = {
+    "Електричар": "⚡",
+    "Водоводџија": "🔧",
+    "Дрводелец": "🪵",
+    "Механичар": "🔩",
+  };
+  return icons[job] || "💼";
+};
+
+// Computed Filtered Services Based on City and Service
+const filteredServicesList = computed(() => {
+  return services.value.filter(service => {
+    const matchesService = !searchService.value || service.job.toLowerCase().includes(searchService.value.toLowerCase());
+    const matchesCity = !searchCity.value || service.location.toLowerCase().includes(searchCity.value.toLowerCase());
+    return matchesService && matchesCity;
   });
-};
-
-// Check if a service is favorited
-const isFavorite = (service) => {
-  return favorites.value.some((fav) => fav.id === service.id);
-};
-
-// Save favorites to localStorage
-const saveFavorites = () => {
-  localStorage.setItem("favorites", JSON.stringify(favorites.value));
-};
-
-// Load favorites on component mount
-const loadFavorites = () => {
-  const storedFavorites = localStorage.getItem("favorites");
-  if (storedFavorites) {
-    favorites.value = JSON.parse(storedFavorites);
-  }
-};
-
-// Show toast notification
-const showToastMessage = () => {
-  showToast.value = true;
-  setTimeout(() => {
-    showToast.value = false;
-  }, 1500);
-};
-
-loadFavorites();
+});
 </script>
 
-<template>
-  <div class="services-container">
-    <div v-for="service in services" :key="service.id" class="service-card">
-      <div class="image-container">
-        <img :src="service.image" :alt="`${service.name} ${service.lastName}`" class="profile-pic" />
-      </div>
-      <div class="info">
-        <h3>{{ service.name }} {{ service.lastName }}</h3>
-        <p class="job-title">{{ service.job }}</p>
-        <button class="contact-btn" @click="goToDetails(service)">Contact Me</button>
-        <button class="favorite-btn" @click="toggleFavorite(service)">
-          <span :class="{ favorite: isFavorite(service) }">★</span>
-        </button>
-      </div>
-    </div>
-  </div>
-
-  <div v-if="showToast" class="toast">Added to Favorites</div>
-</template>
-
 <style scoped>
-/* ---- GRID LAYOUT ---- */
+/* Shared Styles for both Sections */
 .services-container {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
   gap: 30px;
-  padding: 50px;
+  padding: 40px;
   max-width: 1400px;
   margin: auto;
 }
 
-/* ---- SERVICE CARD ---- */
 .service-card {
-  background: rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(10px);
-  border-radius: 15px;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-  padding: 20px;
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(20px);
+  border-radius: 20px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
   text-align: center;
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  position: relative;
+  padding: 20px;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  transition: transform 0.4s ease, box-shadow 0.4s ease;
 }
 
 .service-card:hover {
-  transform: translateY(-8px);
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25);
+  transform: translateY(-8px) scale(1.03);
+  box-shadow: 0 15px 40px rgba(255, 193, 7, 0.5);
 }
 
-/* ---- IMAGE STYLE ---- */
 .image-container {
   width: 100%;
-  height: 180px;
+  height: 200px;
   overflow: hidden;
   border-radius: 15px;
 }
@@ -141,84 +221,183 @@ loadFavorites();
   transform: scale(1.1);
 }
 
-/* ---- TEXT STYLING ---- */
 h3 {
   font-size: 22px;
   font-weight: 700;
-  color: #2c3e50;
+  color: #ffc107;
   margin-top: 15px;
 }
 
-.job-title {
+.job-title, .location, .rating {
   font-size: 16px;
-  font-weight: 500;
-  color: #555;
-  margin-bottom: 20px;
-}
-
-/* ---- CONTACT BUTTON ---- */
-.contact-btn {
-  background: linear-gradient(135deg, #4e73df, #2e59d9);
-  color: white;
-  font-size: 15px;
-  font-weight: 600;
-  padding: 12px 24px;
-  border-radius: 30px;
-  border: none;
-  cursor: pointer;
-  transition: all 0.3s ease;
+  color: #ddd;
   margin-bottom: 10px;
 }
 
-.contact-btn:hover {
-  background: linear-gradient(135deg, #2e59d9, #1e3a8a);
-  box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.3);
+.job-badge {
+  background: rgba(255, 193, 7, 0.2);
+  padding: 5px 10px;
+  border-radius: 10px;
 }
 
-/* ---- FAVORITE BUTTON ---- */
+.btn-container {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.contact-btn {
+  background: linear-gradient(135deg, #ffc107, #ff9800);
+  color: white;
+  font-size: 15px;
+  padding: 10px 20px;
+  border-radius: 25px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.contact-btn:hover {
+  background: linear-gradient(135deg, #ff9800, #ff6f00);
+  box-shadow: 0px 4px 15px rgba(255, 193, 7, 0.4);
+}
+
 .favorite-btn {
   background: none;
   border: none;
   font-size: 24px;
   cursor: pointer;
-  transition: color 0.3s ease-in-out, transform 0.2s ease;
 }
 
 .favorite-btn span {
   color: white;
-  transition: color 0.3s ease-in-out, transform 0.2s ease;
+  transition: color 0.3s ease, transform 0.2s ease;
 }
 
 .favorite-btn span.favorite {
-  color: #f1c40f;
+  color: #ffc107;
   transform: scale(1.2);
 }
 
 .favorite-btn:hover span {
-  color: #f1c40f;
+  color: #ffc107;
   transform: scale(1.1);
 }
 
-/* ---- TOAST NOTIFICATION ---- */
-.toast {
-  position: fixed;
-  bottom: 20px;
-  left: 50%;
-  transform: translateX(-50%);
-  background: #4e73df;
-  color: white;
-  padding: 12px 20px;
-  border-radius: 8px;
-  font-size: 14px;
-  font-weight: 600;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-  opacity: 1;
-  animation: fadeOut 1.5s ease-in-out forwards;
+/* Search Section Styles */
+.background {
+  position: relative;
+  width: 100%;
+  height: 50vh;
+  background: linear-gradient(135deg, #0d0d0d, #1a1a1a);
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
-@keyframes fadeOut {
-  0% { opacity: 1; }
-  70% { opacity: 1; }
-  100% { opacity: 0; }
+.overlay {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(6px);
+}
+
+.container {
+  position: relative;
+  background-color: #212529;
+  border-radius: 15px;
+  padding: 40px;
+  max-width: 750px;
+  width: 90%;
+  text-align: center;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+.title h1 {
+  font-size: 32px;
+  font-weight: 700;
+  color: #ffcc00;
+}
+
+.subtitle {
+  font-size: 16px;
+  color: #ddd;
+  margin-top: 5px;
+}
+
+.inputs-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+.input-group {
+  position: relative;
+  width: 90%;
+  max-width: 350px;
+}
+
+.input-group input {
+  width: 90%;
+  padding: 14px;
+  font-size: 16px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+  border: 2px solid transparent;
+  transition: all 0.3s ease-in-out;
+}
+
+.input-group input:focus {
+  background: rgba(255, 255, 255, 0.2);
+  outline: none;
+  border-color: #ffcc00;
+  box-shadow: 0 0 12px rgba(255, 204, 0, 0.6);
+}
+
+.dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 90%;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(8px);
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  max-height: 180px;
+  overflow-y: auto;
+  z-index: 10;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+.dropdown li {
+  padding: 12px;
+  cursor: pointer;
+  color: white;
+  list-style: none;
+  transition: 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.dropdown li:hover {
+  background: rgba(255, 204, 0, 0.3);
+}
+
+/* Animations */
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.3s ease;
+}
+
+.fade-enter, .fade-leave-to {
+  opacity: 0;
 }
 </style>

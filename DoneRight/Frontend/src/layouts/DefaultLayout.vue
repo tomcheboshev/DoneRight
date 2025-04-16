@@ -3,7 +3,7 @@
     <HeaderSection />
     
     <main>
-      <PreloaderSection />
+      <!-- <PreloaderSection /> -->
       <slot></slot> 
     </main>
 
@@ -12,7 +12,7 @@
 </template>
 
 <script>
-import PreloaderSection from '@/components/common/PreloaderSection.vue';
+// import PreloaderSection from '@/components/common/PreloaderSection.vue';
 import HeaderSection from '@/components/common/HeaderSection.vue';
 import FooterSection from '@/components/common/FooterSection.vue';
 
@@ -20,7 +20,7 @@ export default {
   components: {
     HeaderSection,
     FooterSection,
-    PreloaderSection,
+    // PreloaderSection,
   },
 };
 </script>

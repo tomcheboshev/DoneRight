@@ -1,9 +1,13 @@
 <script setup>
-import { RouterView } from 'vue-router'
+import { RouterView } from 'vue-router';
 </script>
 
 <template>
-  <RouterView />
+  <v-app>
+    <RouterView />
+    <v-btn color="red">Test Button</v-btn>
+
+  </v-app>
 </template>
 
 <style scoped></style>

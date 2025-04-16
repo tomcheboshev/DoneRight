@@ -6,30 +6,30 @@
 <div>
   <footer>
         <div class="column">
-            <h4>Categories</h4>
-            <a href="#">Electrician</a>
-            <a href="#">Plumber</a>
-            <a href="#">Painter</a>
-            <a href="#">Carpenter</a>
-            <a href="#">Technician</a>
+            <h4>Категории</h4>
+            <a href="#">Електричар</a>
+            <a href="#">Чистач</a>
+            <a href="#">Молер</a>
+            <a href="#">Водоводџија</a>
+            <a href="#">Техничар</a>
         </div>
         <div class="column">
-            <h4>Company</h4>
-            <a href="#">About Us</a>
-            <a href="#">Careers</a>
-            <a href="#">Blog</a>
-            <a href="#">Privacy Policy</a>
-            <a href="#">Terms of Service</a>
+            <h4>Компанија</h4>
+            <a href="#">За нас</a>
+            <a href="#">Кариера</a>
+            <a href="#">Блог</a>
+            <a href="#">Политика на приватност</a>
+            <a href="#">Услови за користење</a>
         </div>
         <div class="column">
-            <h4>Support</h4>
-            <a href="#">Help Center</a>
-            <a href="#">Contact Us</a>
+            <h4>Поддршка</h4>
+            <a href="#">Центар за помош</a>
+            <a href="#">Контактирајте нас</a>
             <a href="#">FAQs</a>
-            <a href="#">Report a Problem</a>
+            <a href="#">Пријави проблем</a>
         </div>
         <div class="column">
-            <h4>Follow Us</h4>
+            <h4>Следете нас</h4>
             <a href="#">
             <font-awesome-icon :icon="['fab', 'facebook-f']" class="social-icon"/> Facebook
             </a>
@@ -44,16 +44,16 @@
             </a>
         </div>
         <div class="column">
-            <h4>Newsletter</h4>
+            <h4>Новости</h4>
             <form action="#">
-                <input type="email" placeholder="Your Email" required>
-                <button type="submit">Subscribe</button>
+                <input type="email" placeholder="Вашата емаил адреса" required>
+                <button type="submit">Пријави се</button>
             </form>
         </div>
     </footer>
 
     <div class="footer-bottom">
-        <p> &copy; 2025 Find Your Master. All rights reserved.</p>
+        <p> &copy; 2025 Најди го твојот мајстор. Сите права се задржани.</p>
     </div>
 </div>
 </template>

@@ -1,12 +1,12 @@
 <script setup>
 import DefaultLayout from '@/layouts/DefaultLayout.vue';
 import ServiceCard from '@/components/buyers/ServiceCard.vue';
-import SearchResults from '@/components/buyers/SearchResults.vue';
+// import SearchResults from '@/components/buyers/SearchResults.vue';
 </script>
 
 <template>
  <DefaultLayout>
-   <SearchResults />
+   <!-- <SearchResults /> -->
     <ServiceCard />
  </DefaultLayout>
 </template>

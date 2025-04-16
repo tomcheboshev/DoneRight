@@ -16,7 +16,7 @@ import {
 
 import {
   faUserPlus,
-  faPlug,
+  faPlug, 
   faWrench,
   faPaintRoller,
   faTools,

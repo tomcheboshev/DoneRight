@@ -1,20 +1,20 @@
 <script setup>
 import QrCodeImage from '@/assets/QR.png'
-
 </script>
+
 <template>
   <section id="mobile-app" class="mobile-app-section">
         <div class="content">
             <div class="text-content">
-                <h1>Download Our Mobile App</h1>
-                <p>Experience convenience on the go! Find the best professionals anytime, anywhere, with our mobile app. Available on both iOS and Android.</p>
+                <h1>Преземете ја нашата мобилна апликација</h1>
+                <p>Најдете ги најдобрите професионалци во секое време и насекаде со нашата мобилна апликација. Достапно за iOS и Android.</p>
                 <div class="app-buttons">
                     <a href="#" class="app-store"><font-awesome-icon :icon="['fab', 'apple']" class="app-icon"/> App Store</a>
                     <a href="#" class="play-store"><font-awesome-icon :icon="['fab', 'google-play']" class="app-icon"/> Google Play</a>
                 </div>
             </div>
             <div class="qr-code-content">
-                <img :src="QrCodeImage" alt="Download QR Code" class="qr-code-img">
+                <img :src="QrCodeImage" alt="Преземи QR Код" class="qr-code-img">
             </div>
         </div>
     </section>
@@ -28,78 +28,14 @@ import QrCodeImage from '@/assets/QR.png'
   display: flex;
   justify-content: center;
   align-items: center;
-  margin: 50px 100px; /* Adjusted margin for better responsiveness */
+  margin: 50px 15px;
   border-radius: 40px;
   position: relative;
   overflow: hidden;
-  flex-wrap: nowrap;
+  flex-wrap: wrap;
 }
 
-/* Animated Background Elements */
-/* .mobile-app-section::before,
-.mobile-app-section::after {
-  content: "";
-  position: absolute;
-  width: 250px;
-  height: 250px;
-  background: rgba(255, 193, 7, 0.2);
-  border-radius: 50%;
-  filter: blur(80px);
-  animation: float 6s ease-in-out infinite;
-}
-
-.mobile-app-section::before {
-  top: -30px;
-  left: -30px;
-}
-
-.mobile-app-section::after {
-  bottom: -30px;
-  right: -30px;
-}
-
-@keyframes float {
-  0%, 100% {
-    transform: translateY(0) translateX(0);
-  }
-  50% {
-    transform: translateY(-20px) translateX(20px);
-  }
-}
-
-
-.mobile-app-section::after {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(
-    45deg,
-    rgba(255, 255, 255, 0.05) 25%,
-    transparent 25%,
-    transparent 50%,
-    rgba(255, 255, 255, 0.05) 50%,
-    rgba(255, 255, 255, 0.05) 75%,
-    transparent 75%,
-    transparent
-  );
-  background-size: 40px 40px;
-  z-index: 0;
-  animation: stripesMove 4s linear infinite;
-}
-
-@keyframes stripesMove {
-  0% {
-    background-position: 0 0;
-  }
-  100% {
-    background-position: 40px 40px;
-  }
-} */
-
-/* Content Styles */
+/* Стилови за содржината */
 .mobile-app-section .content {
   display: flex;
   flex-wrap: wrap;
@@ -131,18 +67,7 @@ import QrCodeImage from '@/assets/QR.png'
   animation: fadeIn 1.5s ease-in-out 0.5s;
 }
 
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-/* Button Styles */
+/* Стилови за копчињата */
 .mobile-app-section .app-buttons {
   display: flex;
   justify-content: center;
@@ -163,7 +88,6 @@ import QrCodeImage from '@/assets/QR.png'
   gap: 10px;
   transition: all 0.4s ease;
   box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
-  animation: pulse 2s infinite;
 }
 
 .mobile-app-section .app-buttons a:hover {
@@ -171,18 +95,7 @@ import QrCodeImage from '@/assets/QR.png'
   background: #e6a700;
 }
 
-@keyframes pulse {
-  0%, 100% {
-    transform: scale(1);
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
-  }
-  50% {
-    transform: scale(1.05);
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4);
-  }
-}
-
-/* QR Code Styles */
+/* Стилови за QR кодот */
 .mobile-app-section .qr-code-content {
   flex: 1;
   max-width: 50%;
@@ -191,44 +104,46 @@ import QrCodeImage from '@/assets/QR.png'
 }
 
 .mobile-app-section .qr-code-img {
-  max-width: 80%;
+  max-width: 100%;
   height: auto;
   border-radius: 15px;
   box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
-  animation: bounce 1.5s ease-in-out infinite;
 }
 
-@keyframes bounce {
-  0%, 100% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(-10px);
+/* Респонзивен дизајн */
+@media (max-width: 1200px) {
+  .mobile-app-section {
+    margin: 50px 20px;
   }
 }
 
-/* Responsive Adjustments */
 @media (max-width: 1024px){
   .mobile-app-section .qr-code-content {
     display: none;
   }
   .mobile-app-section .text-content {
-  max-width: 100%;
-}
+    max-width: 100%;
+  }
 }
 
 @media (max-width: 768px) {
   .mobile-app-section {
-    flex-direction: column; /* Stack elements vertically */
+    flex-direction: column;
+    padding: 50px 15px;
   }
-
-  /* Hide QR Code Section on Small Screens */
-  
 
   .mobile-app-section .text-content {
-    max-width: 100%; /* Full width for text */
-    text-align: center; /* Center align text */
+    max-width: 100%;
+    text-align: center;
+  }
+
+  .mobile-app-section .qr-code-content {
+    margin-top: 20px;
+    text-align: center;
+  }
+  
+  .mobile-app-section .qr-code-img {
+    max-width: 60%;
   }
 }
-
 </style>

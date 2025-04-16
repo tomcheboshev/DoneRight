@@ -10,6 +10,7 @@ import EditProfile from '@/components/Auth/EditProfile.vue';
 import SellerDashboard from '@/components/sellers/SellerDashboard.vue';
 import ServiceDetails from '@/components/buyers/ServiceDetails.vue';
 import SuccessPage from '@/components/sellers/SuccessPage.vue';
+import ProfilePicturePage from '@/components/sellers/ProfilePicture.vue';
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -25,7 +26,7 @@ const router = createRouter({
     { path: '/seller-dashboard', component: SellerDashboard },
     { path: '/service/:id', component: ServiceDetails },
     { path: '/success', component: SuccessPage },
-
+    { path: '/profile-picture', component: ProfilePicturePage },
   ],
 });
 

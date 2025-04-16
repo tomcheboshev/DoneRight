@@ -11,35 +11,35 @@ const isLoggedIn = ref(false);
         <div class="content">
             <div class="left-content">
                 <div class="header">
-                  <font-awesome-icon :icon="['fas', 'briefcase']" class="brief-case-icon"/>
-                    <h1>Why Become a Master?</h1>
+                    <font-awesome-icon :icon="['fas', 'briefcase']" class="brief-case-icon"/>
+                    <h1>Зошто да станеш мајстор?</h1>
                 </div>
-                <p>Are you a skilled professional looking to grow your career and connect with more clients? Join our platform today and unlock a world of opportunities. Here's why you should apply:</p>
-                <button @click="router.push('/apply')">Join now<font-awesome-icon :icon="['fas', 'arrow-right']" class="arrow-icon"/></button>
+                <p>Дали си професионалец кој сака да ја прошири својата кариера и да се поврзе со повеќе клиенти? Придружи се на нашата платформа денес и отклучи свет на можности!</p>
+                <button @click="router.push('/apply')">Приклучи се сега<font-awesome-icon :icon="['fas', 'arrow-right']" class="arrow-icon"/></button>
             </div>
             <div class="right-content">
-                <img :src="consImage" alt="Professional Image" />
+                <img :src="consImage" alt="Професионална слика" />
             </div>
         </div>
 
         <div id="how-it-works" class="how-it-works-section">
             <div class="container">
-                <h2>How It Works</h2>
+                <h2>Како функционира</h2>
                 <div class="steps">
                     <div class="step">
-                      <font-awesome-icon :icon="['fas', 'user-plus']" class="apply-icon"/>
-                        <h3>Sign Up</h3>
-                        <p>Register on our platform by filling out a simple form. It only takes a few minutes to get started.</p>
+                        <font-awesome-icon :icon="['fas', 'user-plus']" class="apply-icon"/>
+                        <h3>Регистрирај се</h3>
+                        <p>Регистрирај се на нашата платформа со пополнување на едноставна форма. Ќе ти одземе само неколку минути.</p>
                     </div>
                     <div class="step">
-                      <font-awesome-icon :icon="['fas', 'check-circle']" class="apply-icon"/>
-                        <h3>Create Your Profile</h3>
-                        <p>Set up a professional profile showcasing your skills, experience, and services you offer.</p>
+                        <font-awesome-icon :icon="['fas', 'check-circle']" class="apply-icon"/>
+                        <h3>Креирај профил</h3>
+                        <p>Постави професионален профил со твоите вештини, искуство и услугите што ги нудиш.</p>
                     </div>
                     <div class="step">
-                      <font-awesome-icon :icon="['fas', 'search']" class="apply-icon"/>
-                        <h3>Get Found</h3>
-                        <p>Clients will find you easily through our search feature, based on your location and expertise.</p>
+                        <font-awesome-icon :icon="['fas', 'search']" class="apply-icon"/>
+                        <h3>Стекни клиенти</h3>
+                        <p>Клиентите лесно ќе те пронајдат преку нашиот пребарувачки алгоритам, врз основа на твојата локација и експертиза.</p>
                     </div>
                 </div>
             </div>
@@ -187,7 +187,7 @@ h2 {
 
 .apply-icon {
   font-size: 3rem;
-  color: #ffc107; /* Soft blue color for icons */
+  color: #ffc107;
   margin-bottom: 20px;
   transition: transform 0.3s ease, color 0.3s ease;
 }
@@ -206,12 +206,12 @@ h2 {
 }
 
 .step:hover {
-  transform: translateY(-10px); /* Slight elevation effect */
-  box-shadow: 0 16px 32px rgba(0, 0, 0, 0.2); /* Darker shadow on hover */
+  transform: translateY(-10px);
+  box-shadow: 0 16px 32px rgba(0, 0, 0, 0.2);
 }
 
 .step:hover .apply-icon {
-  color: #917934; /* Darker blue color for icons on hover */
+  color: #917934;
 }
 
 @keyframes fadeInUp {
@@ -225,55 +225,112 @@ h2 {
   }
 }
 
-@media (max-width: 1024px){
+/* Media Queries for Responsiveness */
+@media (max-width: 1024px) {
   .apply-section .right-content img {
-    display: none;
-}
- .apply-section .left-content {
-  max-width: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-} 
-.apply-section .content {
+    max-width: 80%;
+    margin: 0 auto;
+  }
 
-  gap: 0px;
-}
-
-}
-/* Responsive adjustments */
-@media (max-width: 768px) {
+  .apply-section .content {
+    flex-direction: column;
+    gap: 30px;
+    text-align: center;
+  }
 
   .apply-section .left-content {
     max-width: 100%;
     display: flex;
     flex-direction: column;
+    justify-content: center;
     align-items: center;
-    text-align: center;
-    
   }
 
-  .steps {
-    grid-template-columns: 1fr; /* Single-column layout on smaller screens */
+  /* Center header for tablet and mobile devices */
+  .apply-section .left-content .header {
+    justify-content: center; /* Center horizontally */
+    align-items: center;    /* Center vertically */
+    gap: 15px;
+  }
+}
+
+@media (max-width: 768px) {
+  .apply-section .left-content h1 {
+    font-size: 2.5rem;
+  }
+
+  .apply-section .content{
+    display: flex;
+    justify-content: center;
+  }
+
+  .apply-section .left-content p {
+    font-size: 1.2rem;
+  }
+
+  .apply-section .left-content button {
+    padding: 15px 30px;
+    font-size: 18px;
+  }
+
+  .how-it-works-section .steps {
+    grid-template-columns: 1fr;
     gap: 20px;
   }
 
-  .step {
-    padding: 30px;
-    border-radius: 12px; /* Slightly smaller border-radius on mobile */
+  .how-it-works-section h2 {
+    font-size: 2rem;
   }
 
-  .step i {
-    font-size: 2.5rem; /* Smaller icons on mobile */
+  .step {
+    padding: 20px;
+  }
+
+  .apply-icon {
+    font-size: 2.5rem;
   }
 
   .step h3 {
-    font-size: 1.6rem; /* Smaller headings on mobile */
+    font-size: 1.6rem;
   }
 
   .step p {
-    font-size: 1rem; /* Smaller paragraph text on mobile */
+    font-size: 1rem;
+  }
+
+  .apply-section .right-content img {
+    display: none;
+  }
+}
+
+@media (max-width: 480px) {
+  .apply-section .left-content h1 {
+    font-size: 2rem;
+  }
+
+  .apply-section .left-content p {
+    font-size: 1rem;
+  }
+
+  .apply-section .left-content button {
+    padding: 12px 25px;
+    font-size: 16px;
+  }
+
+  .apply-section .right-content img {
+    display: none;
+  }
+
+  .how-it-works-section h2 {
+    font-size: 1.8rem;
+  }
+
+  .step h3 {
+    font-size: 1.4rem;
+  }
+
+  .step p {
+    font-size: 0.9rem;
   }
 }
 </style>

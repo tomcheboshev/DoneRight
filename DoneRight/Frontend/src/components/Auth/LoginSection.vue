@@ -1,149 +1,211 @@
 <script setup>
-// import { RouterLink } from 'vue-router';
+import { ref } from "vue";
+import { useRouter } from "vue-router";
 
-</script>
-  <template>
-<div class="divForm">
-<form class="form">
-  <span class="input-span">
-    <label for="email" class="label">Email</label>
-    <input type="email" name="email" id="email"
-  /></span>
-  <span class="input-span">
-    <label for="password" class="label">Password</label>
-    <input type="password" name="password" id="password"
-  /></span>
-  <span class="span"><a href="#">Forgot password?</a></span>
-  <input class="submit" type="submit" value="Log in" />
-  <span class="span">Don't have an account? <a href="#">Sign up</a></span>
-</form>
-</div>
+const router = useRouter();
 
-          <!-- Don't have an account? <router-link to="/register">Register</router-link> -->
-</template>
+const form = ref({
+  email: "",
+  password: "",
+});
 
-<script>
-export default {
-  data() {
-    return {
-      email: "",
-      password: "",
-    };
-  },
-  methods: {
-  async handleLogin() {
-    try {
-      const response = await fetch("http://localhost:5000/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          email: this.email,
-          password: this.password,
-        }),
-      });
+const handleLogin = async () => {
+  try {
+    const response = await fetch("http://localhost:5000/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(form.value),
+    });
 
-      const data = await response.json();
+    const data = await response.json();
 
-      if (response.ok) {
-        alert("Login successful!");
-        localStorage.setItem("token", data.token);
-        this.$router.push("/dashboard"); // Redirect to dashboard
-      } else {
-        alert(data.error);
-      }
-    } catch (error) {
-      console.error("Error logging in:", error);
+    if (response.ok) {
+      alert("Login successful!");
+      localStorage.setItem("token", data.token);
+      router.push("/dashboard");
+    } else {
+      alert(data.error);
     }
-  },
-},
+  } catch (error) {
+    console.error("Error logging in:", error);
+  }
+};
+
+const redirectToRegister = () => {
+  router.push("/apply");
 };
 </script>
-<style scoped>
-*{
-  background-color: #212121;
-}
 
-.divForm{
+<template>
+  <div class="background">
+    <div class="overlay"></div>
+    <div class="login-container">
+      <h1 class="title">Најава</h1>
+
+      <form @submit.prevent="handleLogin" class="login-form">
+        <div class="input-group">
+          <input type="email" id="email" v-model="form.email" required />
+          <label for="email">Емајл адреса</label>
+        </div>
+
+        <div class="input-group">
+          <input type="password" id="password" v-model="form.password" required />
+          <label for="password">Лозинка</label>
+        </div>
+
+        <p class="account-link">
+          Немате профил? <span @click="redirectToRegister" class="link">Регистрирај се</span>
+        </p>
+
+        <button type="submit" class="submit-btn">Најави се</button>
+      </form>
+    </div>
+  </div>
+</template>
+
+<style scoped>
+/* Background Animation */
+.background {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  background-color: #212529;
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 100vh;
-}
-.form {
-  --bg-light: #efefef;
-  --bg-dark: #707070;
-  --clr: #58bc82;
-  --clr-alpha: #64646460;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 1rem;
-  width: 100%;
-  max-width: 300px;
+  overflow: hidden;
 }
 
-.form .input-span {
+/* Overlay for a sleek effect */
+.overlay {
+  position: absolute;
   width: 100%;
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(10px);
 }
 
-.form input[type="email"],
-.form input[type="password"] {
-  border-radius: 0.5rem;
-  padding: 1rem 0.75rem;
+/* Form Container */
+.login-container {
+  position: relative;
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 30px;
+  max-width: 400px;
   width: 100%;
-  border: none;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
+  box-shadow: 0 5px 25px rgba(0, 0, 0, 0.3);
+  text-align: center;
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* Title */
+.title {
+  font-size: 24px;
+  font-weight: 700;
+  color: #ffc107;
+}
+
+/* Input Fields */
+.input-group {
+  position: relative;
+  width: 92%;
+  margin-bottom: 15px;
+}
+
+.input-group input {
+  width: 100%;
+  padding: 14px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 6px;
+  font-size: 14px;
+  background: rgba(255, 255, 255, 0.2);
   color: white;
-  background-color: var(--clr-alpha);
-  outline: 2px solid var(--bg-dark);
+  transition: 0.3s;
+  margin-top: 6px;
 }
 
-.form input[type="email"]:focus,
-.form input[type="password"]:focus {
-  outline: 2px solid var(--clr);
+.input-group input:focus {
+  background: rgba(255, 255, 255, 0.3);
+  outline: none;
+  border-color: #ffc107;
 }
 
-.label {
-  align-self: flex-start;
-  color: var(--clr);
-  font-weight: 600;
+/* Floating Label */
+.input-group label {
+  position: absolute;
+  top: 54%;
+  left: 12px;
+  transform: translateY(-50%);
+  font-size: 14px;
+  color: #ddd;
+  transition: 0.3s;
+  pointer-events: none;
 }
 
-.form .submit {
-  padding: 1rem 0.75rem;
-  width: 100%;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  border-radius: 3rem;
-  background-color: var(--bg-dark);
-  color: var(--bg-light);
-  border: none;
+.input-group input:focus + label,
+.input-group input:valid + label {
+  top: -2px;
+  left: 5px;
+  font-size: 12px;
+  color: white;
+}
+
+/* Account Link */
+.account-link {
+  font-size: 14px;
+  margin-top: 20px;
+  color: #ddd;
+}
+
+.account-link .link {
+  color: #ffc107;
   cursor: pointer;
-  transition: all 300ms;
   font-weight: 600;
-  font-size: 0.9rem;
 }
 
-.form .submit:hover {
-  background-color: var(--clr);
-  color: var(--bg-dark);
+.account-link .link:hover {
+  text-decoration: underline;
 }
 
-.span {
-  text-decoration: none;
-  color: var(--bg-dark);
+/* Submit Button */
+.submit-btn {
+  width: 100%;
+  padding: 14px;
+  background: linear-gradient(90deg, #ff9d00, #ffcd38);
+  color: white;
+  font-size: 16px;
+  font-weight: 600;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: 0.3s;
+  margin-top: 15px;
 }
 
-.span a {
-  color: var(--clr);
+.submit-btn:hover {
+  background: linear-gradient(90deg, #ffb400, #ffdf70);
 }
 
+/* Responsiveness */
+@media (max-width: 480px) {
+  .login-container {
+    padding: 20px;
+    max-width: 75%;
+  }
+
+  .title {
+    font-size: 22px;
+  }
+
+  .input-group input {
+    font-size: 16px;
+    padding: 12px;
+  }
+
+  .submit-btn {
+    font-size: 14px;
+    padding: 12px;
+  }
+}
 </style>
