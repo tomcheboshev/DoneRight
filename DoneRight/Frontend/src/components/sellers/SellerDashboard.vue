@@ -1,275 +1,300 @@
 <template>
   <v-app>
-    <!-- Sidebar -->
-    <v-navigation-drawer
-  v-model="drawer"
-  :mini-variant.sync="mini"
-  app
-  permanent
-  class="custom-drawer"
-  :class="{ 'v-navigation-drawer--mini': mini }"
->
-      <!-- User Info -->
-      <v-list-item class="drawer-header">
-        <v-list-item-avatar>
-          <v-img :src="user.profilePicture" />
-        </v-list-item-avatar>
-        <v-list-item-content v-if="!mini && $vuetify.display.mdAndUp">
-          <v-list-item-title class="white--text">{{ user.firstName }}</v-list-item-title>
-          <v-list-item-subtitle class="white--text text-caption">{{ user.email }}</v-list-item-subtitle>
-        </v-list-item-content>
-      </v-list-item>
+    <!-- Layout wrapper to shift content with sidebar -->
+    <div class="layout-wrapper" :class="{ 'is-rail': isRail }">
+      <!-- Sidebar -->
+      <v-navigation-drawer
+        v-model="drawer"
+        :rail="isRail"
+        :temporary="$vuetify.display.smAndDown"
+        width="260"
+        rail-width="72"
+        class="frosted-sidebar"
+        app
+      >
+        <!-- Sidebar Header -->
+        <div class="sidebar-header" :class="{ 'rail-mode': isRail }">
+          <v-avatar size="48" color="black">
+            <v-img :src="logo" alt="Logo" cover />
+          </v-avatar>
+          <span v-if="!isRail" class="ml-3 logo-text">DoneRight</span>
+        </div>
 
-      <v-divider class="mb-2" />
+        <v-divider class="mb-2" />
 
-      <!-- Navigation Links -->
-      <v-list nav dense>
-        <v-list-item
-          v-for="item in navItems"
-          :key="item.title"
-          link
-          :to="item.route"
-          class="custom-list-item"
-        >
-          <v-list-item-icon>
-            <v-icon>{{ item.icon }}</v-icon>
-          </v-list-item-icon>
-          <v-list-item-title v-if="!mini">{{ item.title }}</v-list-item-title>
-        </v-list-item>
-      </v-list>
-    </v-navigation-drawer>
-
-    <!-- Floating Toggle Button -->
-    <div class="sidebar-toggle-btn" :class="{ collapsed: mini }" @click="toggleDrawer">
-      <v-icon color="white">
-        {{ mini ? 'mdi-chevron-right' : 'mdi-chevron-left' }}
-      </v-icon>
-    </div>
-
-    <!-- Top App Bar -->
-    <v-app-bar app color="deep-orange accent-4" dark elevate-on-scroll>
-      <v-app-bar-nav-icon @click="drawer = !drawer" class="d-md-none" />
-      <v-toolbar-title>🔥 Seller Dashboard</v-toolbar-title>
-      <v-spacer />
-      <v-btn icon><v-icon>mdi-bell</v-icon></v-btn>
-      <v-btn icon><v-icon>mdi-account-circle</v-icon></v-btn>
-    </v-app-bar>
-
-    <!-- Main Content -->
-    <v-main class="main-content">
-      <v-container fluid>
-        <v-card elevation="2" class="pa-6 mb-6 welcome-card">
-          <v-card-title class="text-h5">Welcome, {{ user.firstName }} 👋</v-card-title>
-        </v-card>
-
-        <!-- Stat Cards -->
-        <v-row class="mb-6">
-          <v-col cols="12" sm="6" md="4" v-for="card in cards" :key="card.title">
-            <v-hover v-slot:default="{ isHovering, props }">
-              <v-card
+        <!-- Nav Links -->
+        <v-list nav dense>
+          <v-tooltip
+            v-for="item in navItems"
+            :key="item.title"
+            location="right"
+            :disabled="!isRail"
+          >
+            <template #activator="{ props }">
+              <v-list-item
                 v-bind="props"
-                class="pa-4 stat-card"
-                :elevation="isHovering ? 10 : 3"
-                :class="{ 'hovered-card': isHovering }"
+                :to="item.route"
+                link
+                class="sidebar-link"
               >
-                <v-card-title class="text-h6">{{ card.title }}</v-card-title>
-                <v-card-subtitle>{{ card.subtitle }}</v-card-subtitle>
-                <v-card-actions v-if="card.action">
-                  <v-btn color="deep-orange" @click="card.action">
-                    {{ card.actionLabel }}
-                  </v-btn>
-                </v-card-actions>
-              </v-card>
-            </v-hover>
-          </v-col>
-        </v-row>
+                <div class="sidebar-content">
+                  <v-icon class="sidebar-icon" size="24">{{ item.icon }}</v-icon>
+                  <span v-if="!isRail" class="sidebar-text">{{ item.title }}</span>
+                </div>
+              </v-list-item>
+            </template>
+            <span>{{ item.title }}</span>
+          </v-tooltip>
+        </v-list>
+      </v-navigation-drawer>
 
-        <!-- Orders -->
-        <v-card elevation="2" class="pa-4">
-          <v-card-title>Recent Orders</v-card-title>
-          <v-divider class="mb-4"></v-divider>
-          <v-list>
-            <v-list-item
-              v-for="order in orders"
-              :key="order.id"
-              class="order-item"
-            >
-              <v-list-item-content>
-                <v-list-item-title>
-                  <strong>{{ order.customerName }}</strong> ordered <strong>{{ order.serviceTitle }}</strong>
-                </v-list-item-title>
-                <v-list-item-subtitle>
-                  Status:
-                  <v-chip :color="statusColor(order.status)" small>
-                    {{ order.status }}
-                  </v-chip>
-                </v-list-item-subtitle>
-              </v-list-item-content>
-              <v-list-item-action>
-                <v-btn icon color="green" @click="acceptOrder(order.id)">
-                  <v-icon>mdi-check</v-icon>
-                </v-btn>
-                <v-btn icon color="red" @click="rejectOrder(order.id)">
-                  <v-icon>mdi-close</v-icon>
-                </v-btn>
-              </v-list-item-action>
-            </v-list-item>
-          </v-list>
-        </v-card>
-      </v-container>
-    </v-main>
+      <!-- Top App Bar -->
+      <v-app-bar flat color="white" class="elevation-1 topbar">
+        <v-app-bar-nav-icon class="d-sm-none" @click="drawer = !drawer" />
+        <v-toolbar-title class="text-primary font-weight-bold">🚀 Nova Dashboard</v-toolbar-title>
+        <v-spacer />
+        <v-btn icon><v-icon>mdi-magnify</v-icon></v-btn>
+        <v-btn icon><v-icon>mdi-bell-outline</v-icon></v-btn>
+        <v-btn icon><v-icon>mdi-account-circle</v-icon></v-btn>
+      </v-app-bar>
+
+      <!-- Main Content -->
+      <v-main class="main-area">
+        <v-container>
+          <transition name="fade-slide">
+            <v-card class="welcome-card" elevation="2">
+              <v-card-title class="text-white">🔥 Welcome back, Rockstar!</v-card-title>
+              <v-card-subtitle class="text-white">Let's build something awesome today.</v-card-subtitle>
+            </v-card>
+          </transition>
+
+          <v-row class="mt-4">
+            <v-col cols="12" sm="6" md="4" v-for="stat in stats" :key="stat.title">
+              <v-hover v-slot="{ isHovering, props }">
+                <v-card
+                  v-bind="props"
+                  :elevation="isHovering ? 12 : 3"
+                  class="stat-card"
+                >
+                  <v-card-title>
+                    <v-icon class="mr-2 text-primary" size="28">{{ stat.icon }}</v-icon>
+                    <strong>{{ stat.title }}</strong>
+                  </v-card-title>
+                  <v-card-subtitle class="text-grey">{{ stat.subtitle }}</v-card-subtitle>
+                </v-card>
+              </v-hover>
+            </v-col>
+          </v-row>
+        </v-container>
+      </v-main>
+    </div>
   </v-app>
 </template>
-
 <script setup>
 import { ref } from 'vue'
-import { useRouter } from 'vue-router'
-
-const router = useRouter()
+import logo from '@/assets/logo.png'
 const drawer = ref(true)
-const mini = ref(false)
-
-const toggleDrawer = () => {
-  mini.value = !mini.value
-}
-
-const user = ref({
-  firstName: 'John',
-  lastName: 'Doe',
-  email: 'john.doe@example.com',
-  profilePicture: '/profile.jpg'
-})
 
 const navItems = [
-  { title: 'Dashboard', icon: 'mdi-view-dashboard', route: '/seller-dashboard' },
-  { title: 'Services', icon: 'mdi-hammer-wrench', route: '/seller-dashboard/services' },
-  { title: 'Orders', icon: 'mdi-package-variant', route: '/seller-dashboard/orders' },
-  { title: 'Reviews', icon: 'mdi-star-outline', route: '/seller-dashboard/reviews' },
-  { title: 'Earnings', icon: 'mdi-cash-multiple', route: '/seller-dashboard/earnings' },
-  { title: 'Settings', icon: 'mdi-cog-outline', route: '/seller-dashboard/settings' },
+  { title: 'Dashboard', icon: 'mdi-view-dashboard', route: '/' },
+  { title: 'Users', icon: 'mdi-account-group-outline', route: '/users' },
+  { title: 'Reports', icon: 'mdi-chart-box-outline', route: '/reports' },
+  { title: 'Settings', icon: 'mdi-cog-outline', route: '/settings' },
 ]
 
-const cards = [
-  {
-    title: 'Your Services',
-    subtitle: '2 Active Services',
-    actionLabel: 'Add New',
-    action: () => router.push('/add-service')
-  },
-  {
-    title: 'Orders',
-    subtitle: '2 Pending Orders'
-  },
-  {
-    title: 'Earnings',
-    subtitle: '$250',
-    actionLabel: 'Withdraw',
-    action: () => alert('Withdrawal requested!')
-  }
+const stats = [
+  { title: 'Active Users', subtitle: '1,482 online now', icon: 'mdi-account' },
+  { title: 'Revenue', subtitle: '$42,300 this month', icon: 'mdi-currency-usd' },
+  { title: 'Tasks Completed', subtitle: '86% done', icon: 'mdi-check-circle-outline' }
 ]
-
-const orders = ref([
-  { id: 1, customerName: 'Alice', serviceTitle: 'Web Development', status: 'Pending' },
-  { id: 2, customerName: 'Bob', serviceTitle: 'Graphic Design', status: 'In-progress' }
-])
-
-const acceptOrder = (id) => {
-  const order = orders.value.find(o => o.id === id)
-  if (order) order.status = 'Accepted'
-}
-
-const rejectOrder = (id) => {
-  const order = orders.value.find(o => o.id === id)
-  if (order) order.status = 'Rejected'
-}
-
-const statusColor = (status) => {
-  switch (status.toLowerCase()) {
-    case 'pending': return 'yellow darken-3'
-    case 'in-progress': return 'blue lighten-2'
-    case 'accepted': return 'green'
-    case 'rejected': return 'red'
-    default: return 'grey'
-  }
-}
 </script>
-
 <style scoped>
-/* Sidebar styles */
-.custom-drawer {
-  background: linear-gradient(135deg, #ff9800, #ffb300);
-  color: white;
+/* Layout wrapper syncs everything with sidebar */
+.layout-wrapper {
   transition: all 0.3s ease;
-  z-index: 1000;
+  margin-left: 260px;
+}
+.layout-wrapper.is-rail {
+  margin-left: 72px;
+}
+@media (max-width: 960px) {
+  .layout-wrapper,
+  .layout-wrapper.is-rail {
+    margin-left: 0;
+  }
 }
 
-.drawer-header {
-  padding-top: 20px;
-  padding-bottom: 20px;
+.main-area {
+  background: #f5f7fa;
+  min-height: 100vh;
+  padding: 20px;
+  transition: all 0.3s ease;
 }
 
-.custom-list-item {
-  transition: all 0.2s ease;
-  border-radius: 8px;
-  margin: 4px 8px;
-}
-
-.custom-list-item:hover {
-  background-color: rgba(255, 255, 255, 0.2);
-}
-
-/* Floating toggle button */
-.sidebar-toggle-btn {
-  position: fixed;
-  top: 50%;
-  transform: translateY(-50%);
-  left: calc(260px - 20px); /* when open */
-  width: 40px;
-  height: 40px;
-  background: #ff9800;
+/* Sidebar */
+.frosted-sidebar {
+  background: rgba(33, 150, 243, 0.85);
+  backdrop-filter: blur(12px);
   color: white;
+  transition: width 0.3s ease;
+  overflow: hidden;
+}
+
+/* Header */
+.sidebar-header {
+  display: flex;
+  align-items: center;
+  padding: 16px;
+  transition: all 0.3s ease;
+}
+.sidebar-header.rail-mode {
+  flex-direction: column;
+  justify-content: center;
+}
+.logo-text {
+  font-weight: 600;
+  font-size: 20px;
+  color: white;
+}
+
+/* Toggle Button */
+.sidebar-toggle {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 12px auto;
+  height: 38px;
+  width: 38px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.2);
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+.sidebar-toggle:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+/* Nav Items */
+.sidebar-link {
+  padding: 6px 8px;
+  border-radius: 8px;
+  margin: 4px 10px;
+  transition: all 0.2s ease;
+}
+.sidebar-link:hover {
+  background-color: rgba(255, 255, 255, 0.15);
+}
+.sidebar-content {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.sidebar-icon {
+  color: white;
+}
+.sidebar-text {
+  font-size: 15px;
+  font-weight: 500;
+  color: white;
+}
+
+/* Rail Mode */
+.frosted-sidebar.v-navigation-drawer--rail .sidebar-content {
+  flex-direction: column;
+  align-items: center;
+}
+.frosted-sidebar.v-navigation-drawer--rail .sidebar-text {
+  display: none;
+}
+
+/* Welcome Card */
+.welcome-card {
+  background: linear-gradient(90deg, #007cf0, #00dfd8);
+  border-radius: 12px;
+  padding: 20px;
+  color: white;
+  animation: fadeIn 0.5s ease-out;
+}
+
+/* Stat Cards */
+.stat-card {
+  border-radius: 12px;
+  padding: 18px;
+  background-color: white;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* Fancy Toggle Wrapper */
+.sidebar-toggle-wrapper {
+  display: flex;
+  justify-content: center;
+  margin-top: 10px;
+}
+
+.sidebar-toggle-btn {
+  background: white;
+  color: #1976d2;
+  height: 40px;
+  width: 40px;
+  border-radius: 50%;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.15);
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 50%;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
   cursor: pointer;
-  z-index: 1100;
-  transition: left 0.3s ease;
+  transition: all 0.3s ease;
 }
 
-.sidebar-toggle-btn.collapsed {
-  left: calc(80px - 20px); /* when collapsed */
+.sidebar-toggle-btn:hover {
+  background: #f0f0f0;
+  transform: scale(1.1);
 }
 
-.main-content {
-  background: #f4f4f4;
-  min-height: 100vh;
+.toggle-icon {
+  transition: transform 0.3s ease;
 }
 
-.welcome-card {
-  background: linear-gradient(to right, #ff9800, #ffc107);
-  color: white;
-  border-radius: 12px;
+.toggle-icon.rotated {
+  transform: rotate(180deg);
 }
 
-.stat-card {
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-  border-radius: 10px;
-  background-color: white;
+
+/* Transitions */
+.fade-slide-enter-active {
+  animation: fadeSlideIn 0.4s ease;
+}
+.fade-slide-leave-active {
+  animation: fadeSlideOut 0.3s ease;
+}
+@keyframes fadeSlideIn {
+  0% {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@keyframes fadeSlideOut {
+  0% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+}
+@keyframes fadeIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 
-.hovered-card {
-  transform: translateY(-4px);
-}
-
-.order-item {
-  background-color: white;
-  border-radius: 8px;
-  transition: all 0.2s ease;
-}
-
-.order-item:hover {
-  background-color: #f1f1f1;
-}
 </style>
