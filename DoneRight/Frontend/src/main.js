@@ -1,10 +1,17 @@
 import './assets/main.css'
+import 'vuetify/styles' // 💡 Vuetify core styles
+import { createVuetify } from 'vuetify'
+import * as components from 'vuetify/components'
+import * as directives from 'vuetify/directives'
+import '@mdi/font/css/materialdesignicons.css'
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
-import { library } from '@fortawesome/fontawesome-svg-core';
-import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
+import { library } from '@fortawesome/fontawesome-svg-core'
+import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome"
+
 import App from './App.vue'
 import router from './router'
+
 import { 
   faGooglePlay,
   faApple,
@@ -12,7 +19,7 @@ import {
   faTwitter,
   faInstagram,
   faLinkedin 
-} from '@fortawesome/free-brands-svg-icons';
+} from '@fortawesome/free-brands-svg-icons'
 
 import {
   faUserPlus,
@@ -31,10 +38,18 @@ import {
   faBriefcase,
   faArrowRight,
   faCheckCircle,
-} from '@fortawesome/free-solid-svg-icons';
+} from '@fortawesome/free-solid-svg-icons'
 
-const app = createApp(App);
-app.component("font-awesome-icon", FontAwesomeIcon);
+// Set up Vuetify
+const vuetify = createVuetify({
+  components,
+  directives,
+})
+
+// Set up app
+const app = createApp(App)
+
+app.component("font-awesome-icon", FontAwesomeIcon)
 
 library.add(
   faUserPlus, 
@@ -59,9 +74,9 @@ library.add(
   faTwitter, 
   faInstagram, 
   faLinkedin
-);
-
+)
 
 app.use(createPinia())
 app.use(router)
+app.use(vuetify) // 🔥 Inject Vuetify here
 app.mount('#app')

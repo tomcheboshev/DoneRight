@@ -39,7 +39,7 @@ onMounted(() => {
 
 // Redirect functions
 const goToDashboard = () => {
-  router.push("/seller-dashboard");
+  router.push("/seller-dashboard  ");
 };
 
 const exploreServices = () => {

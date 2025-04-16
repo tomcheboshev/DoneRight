@@ -5,8 +5,6 @@ import { RouterView } from 'vue-router';
 <template>
   <v-app>
     <RouterView />
-    <v-btn color="red">Test Button</v-btn>
-
   </v-app>
 </template>
 
