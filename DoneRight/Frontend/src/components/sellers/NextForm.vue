@@ -1,8 +1,12 @@
 <script setup>
 import { ref } from "vue";
 import { useRouter } from "vue-router";
+import { db } from "@/firebase"; // Your Firebase config file
+import { collection, addDoc, Timestamp } from "firebase/firestore";
+import { getAuth } from "firebase/auth"; // Import Firebase Authentication
 
 const router = useRouter();
+const auth = getAuth(); // Initialize Firebase Authentication
 
 const form = ref({
   service: "",
@@ -29,18 +33,41 @@ const availableServices = [
   "Друго",
 ];
 
-const submitMasterProfile = () => {
+const submitMasterProfile = async () => {
   if (!form.value.service) {
     alert("Изберете услуга.");
     return;
   }
-  console.log(form.value);
-  router.push("/profile-picture");
+
+  // Get the current logged-in user's ID
+  const user = auth.currentUser;
+  if (!user) {
+    alert("User is not logged in");
+    return;
+  }
+
+  try {
+    // Add data to the 'masters' collection
+    const docRef = await addDoc(collection(db, "masters"), {
+      service: form.value.service,
+      description: form.value.description,
+      experience: form.value.experience,
+      price: form.value.price,
+      userId: user.uid, // Use the logged-in user's ID
+      createdAt: Timestamp.fromDate(new Date()), // Adds a timestamp for creation
+    });
+
+    console.log("Master profile added with ID: ", docRef.id);
+    router.push("/profile-picture");
+  } catch (e) {
+    console.error("Error adding document: ", e);
+  }
 };
 
 const redirectToPreviousForm = () => {
   router.push("/apply");
 };
+
 </script>
 
 <template>

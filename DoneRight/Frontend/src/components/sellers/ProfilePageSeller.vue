@@ -1,7 +1,11 @@
 <script setup>
 import { ref } from "vue";
 import { useRouter } from "vue-router";
+import { db, auth } from "@/firebase";
+import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
+import { collection, addDoc } from "firebase/firestore";
 
+// Form Data
 const form = ref({
   firstName: "",
   lastName: "",
@@ -10,13 +14,43 @@ const form = ref({
   city: "",
   address: "",
   password: "",
-  confirmPassword: "",
 });
 
 const router = useRouter();
 
-const submitApplication = () => {
-  router.push("/next-form");
+const submitApplication = async () => {
+  try {
+    // Register User with Firebase Authentication
+    const userCredential = await createUserWithEmailAndPassword(
+      auth,
+      form.value.email,
+      form.value.password
+    );
+
+    // Update Firebase Authentication profile with display name
+    await updateProfile(userCredential.user, {
+      displayName: `${form.value.firstName} ${form.value.lastName}`,
+    });
+
+    // Add user data to Firestore (including the rest of the form details)
+    const userRef = collection(db, "users");
+    await addDoc(userRef, {
+      firstName: form.value.firstName,
+      lastName: form.value.lastName,
+      email: form.value.email,
+      phone: form.value.phone,
+      city: form.value.city,
+      address: form.value.address,
+      uid: userCredential.user.uid, // Use the Firebase UID for the user
+      createdAt: new Date(), // Timestamp when user was created
+    });
+
+    alert("Успешна регистрација!");
+    router.push("/next-form"); // Redirect to next form
+  } catch (error) {
+    console.error("Грешка при регистрација:", error);
+    alert(error.message);
+  }
 };
 
 const redirectToLogin = () => {

@@ -1,5 +1,39 @@
 <script setup>
-import { RouterLink } from 'vue-router';
+import { RouterLink, useRouter } from 'vue-router'
+import { ref } from 'vue'
+import { auth } from '@/firebase'
+import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth'
+
+const router = useRouter()
+
+const name = ref("")
+const email = ref("")
+const password = ref("")
+const confirmPassword = ref("")
+
+const handleRegister = async () => {
+  if (password.value !== confirmPassword.value) {
+    alert("Passwords do not match!")
+    return
+  }
+
+  try {
+    // Create user with Firebase Auth
+    const userCredential = await createUserWithEmailAndPassword(auth, email.value, password.value)
+
+    // Optionally update the display name
+    await updateProfile(userCredential.user, {
+      displayName: name.value
+    })
+
+    alert("Registration successful!")
+    router.push('/login')
+
+  } catch (error) {
+    console.error("Registration error:", error)
+    alert(error.message)
+  }
+}
 </script>
 
 <template>
@@ -50,57 +84,11 @@ import { RouterLink } from 'vue-router';
         <button type="submit" class="auth-button">Register</button>
       </form>
       <p class="auth-link">
-        Already have an account? <router-link to="/login">Login</router-link>
+        Already have an account?
+        <RouterLink to="/login">Login</RouterLink>
       </p>
     </div>
   </div>
 </template>
-
-<script>
-export default {
-  data() {
-    return {
-      name: "",
-      email: "",
-      password: "",
-      confirmPassword: "",
-    };
-  },
-  methods: {
-  async handleRegister() {
-    if (this.password !== this.confirmPassword) {
-      alert("Passwords do not match!");
-      return;
-    }
-
-    try {
-      const response = await fetch("http://localhost:5000/register", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          name: this.name,
-          email: this.email,
-          password: this.password,
-        }),
-      });
-
-      const data = await response.json();
-
-      if (response.ok) {
-        alert("Registration successful!");
-        this.$router.push("/login");
-      } else {
-        alert(data.error);
-      }
-    } catch (error) {
-      console.error("Error registering:", error);
-    }
-  },
-},
-
-};
-</script>
 
 <style scoped src="@/assets/auth.css"></style>

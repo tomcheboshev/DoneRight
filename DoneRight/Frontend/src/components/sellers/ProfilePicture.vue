@@ -19,7 +19,9 @@
         <img ref="imageRef" :src="selectedFile" class="cropper-image" />
       </div>
 
-      <button v-if="selectedFile" @click="submitProfilePicture" class="submit-btn">Заврши</button>
+      <button v-if="selectedFile" @click="submitProfilePicture" class="submit-btn">
+        Заврши
+      </button>
     </div>
   </div>
 </template>
@@ -29,31 +31,44 @@ import { ref, nextTick } from "vue";
 import Cropper from "cropperjs";
 import "cropperjs/dist/cropper.css";
 import { useRouter } from "vue-router";
+import { getStorage, ref as storageRef, uploadString, getDownloadURL } from "firebase/storage";
+import { getAuth } from "firebase/auth";
+import { db } from "@/firebase";
+import { doc, setDoc } from "firebase/firestore";
 
 const router = useRouter();
+const auth = getAuth();
+const storage = getStorage();
+
 const imageRef = ref(null);
 const cropper = ref(null);
 const selectedFile = ref(null);
 
-// File Upload Handling
+// Handle file selection via input change
 const handleFileChange = (event) => {
   const file = event.target.files[0];
   processFile(file);
 };
 
+// Handle drag-and-drop events
 const handleDrop = (event) => {
   event.preventDefault();
   const file = event.dataTransfer.files[0];
   processFile(file);
 };
 
+// Process the file and initialize Cropper
 const processFile = (file) => {
   if (file) {
+    console.log("✅ Selected file:", file);
     const reader = new FileReader();
     reader.onload = (e) => {
       selectedFile.value = e.target.result;
+      console.log("✅ FileReader result (data URL):", selectedFile.value.slice(0, 100));
       nextTick(() => {
+        console.log("🔄 Waiting for imageRef to be set...");
         if (imageRef.value) {
+          console.log("✅ imageRef is set:", imageRef.value);
           cropper.value = new Cropper(imageRef.value, {
             aspectRatio: 1,
             viewMode: 2,
@@ -62,24 +77,73 @@ const processFile = (file) => {
             scalable: true,
             movable: true,
             cropBoxResizable: true,
+            ready() {
+              console.log("✅ Cropper initialized successfully.");
+            }
           });
+        } else {
+          console.error("❌ imageRef is not set. Cannot initialize Cropper.");
         }
       });
     };
+    reader.onerror = (err) => {
+      console.error("❌ FileReader error:", err);
+    };
     reader.readAsDataURL(file);
+  } else {
+    console.error("❌ No file selected.");
   }
 };
 
-// Submit Cropped Image
-const submitProfilePicture = () => {
+// Submit the cropped image to Firebase Storage and update the new collection "userProfilePictures"
+const submitProfilePicture = async () => {
+  console.log("🚀 Submitting cropped image...");
   if (!cropper.value) {
     alert("Мора да изберете и прилагодите профилна слика.");
+    console.error("❌ Cropper not initialized.");
     return;
   }
 
-  cropper.value.getCroppedCanvas().toDataURL("image/png");
-  console.log("Сликата е успешно обработена!");
-  router.push("/success");
+  const croppedCanvas = cropper.value.getCroppedCanvas();
+  if (!croppedCanvas) {
+    console.error("❌ Cropper did not return a canvas.");
+    return;
+  }
+
+  const croppedImage = croppedCanvas.toDataURL("image/png");
+  console.log("✅ Cropped image data URL (first 100 chars):", croppedImage.slice(0, 100));
+
+  try {
+    const user = auth.currentUser;
+    if (!user) {
+      alert("User not logged in!");
+      console.error("❌ No authenticated user found.");
+      return;
+    }
+
+    // Create a reference in Firebase Storage for the user's profile picture
+    const storageReference = storageRef(storage, `profile_pictures/${user.uid}`);
+    console.log("✅ Firebase storage reference created:", storageReference);
+
+    // Upload the image to Firebase Storage
+    const uploadTask = await uploadString(storageReference, croppedImage, "data_url");
+    console.log("✅ Image uploaded to Firebase Storage:", uploadTask);
+
+    // Retrieve download URL
+    const downloadURL = await getDownloadURL(uploadTask.ref);
+    console.log("✅ Download URL from Firebase:", downloadURL);
+
+    // Update (or create) the document in the "userProfilePictures" collection
+    const profilePicDocRef = doc(db, "userProfilePictures", user.uid);
+    console.log("📄 Updating Firestore document at:", profilePicDocRef);
+
+    await setDoc(profilePicDocRef, { profilePicture: downloadURL });
+    console.log("✅ Firestore document created/updated successfully with profilePicture.");
+
+    router.push("/success");
+  } catch (error) {
+    console.error("❌ Error during submission process:", error);
+  }
 };
 </script>
 
@@ -210,33 +274,27 @@ const submitProfilePicture = () => {
   transform: scale(1.05);
 }
 
-/* 🔥 RESPONSIVE DESIGN */
+/* Responsive Design */
 @media (max-width: 768px) {
   .profile-container {
     max-width: 90%;
     padding: 20px;
   }
-
   .title {
     font-size: 20px;
   }
-
   .subtitle {
     font-size: 13px;
   }
-
   .upload-box {
     height: 120px;
   }
-
   .upload-icon {
     font-size: 26px;
   }
-
   .upload-text {
     font-size: 12px;
   }
-
   .submit-btn {
     padding: 12px;
     font-size: 15px;
@@ -248,27 +306,21 @@ const submitProfilePicture = () => {
     max-width: 95%;
     padding: 15px;
   }
-
   .title {
     font-size: 18px;
   }
-
   .subtitle {
     font-size: 12px;
   }
-
   .upload-box {
     height: 110px;
   }
-
   .upload-icon {
     font-size: 24px;
   }
-
   .upload-text {
     font-size: 11px;
   }
-
   .submit-btn {
     padding: 10px;
     font-size: 14px;
