@@ -1,36 +1,46 @@
-  <script setup>
+<script setup>
 import { ref, onMounted, onUnmounted } from "vue";
 import { RouterLink } from "vue-router";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
-import { faBars, faTimes} from "@fortawesome/free-solid-svg-icons";
+import { faBars, faTimes } from "@fortawesome/free-solid-svg-icons";
 import LogoImg from "@/assets/logo.png";
 
-  const isLoggedIn = ref(true);
-  const menuOpen = ref(false);
-  const isDarkMode = ref(false);
-  const isShrunk = ref(false);
+// 👇 NEW import
+import { getAuth, onAuthStateChanged } from "firebase/auth";
 
-  const toggleMenu = () => {
-    menuOpen.value = !menuOpen.value;
-  };
+const isLoggedIn = ref(false);
+const menuOpen = ref(false);
+const isDarkMode = ref(false);
+const isShrunk = ref(false);
 
-  const toggleDarkMode = () => {
-    isDarkMode.value = !isDarkMode.value;
-    document.body.classList.toggle("dark-mode", isDarkMode.value);
-  };
+const toggleMenu = () => {
+  menuOpen.value = !menuOpen.value;
+};
 
-  const handleScroll = () => {
-    isShrunk.value = window.scrollY > 50;
-  };
+const toggleDarkMode = () => {
+  isDarkMode.value = !isDarkMode.value;
+  document.body.classList.toggle("dark-mode", isDarkMode.value);
+};
 
-  onMounted(() => {
-    window.addEventListener("scroll", handleScroll);
+const handleScroll = () => {
+  isShrunk.value = window.scrollY > 50;
+};
+
+onMounted(() => {
+  // 👇 Listen for auth state changes
+  const auth = getAuth();
+  onAuthStateChanged(auth, (user) => {
+    isLoggedIn.value = !!user;
   });
 
-  onUnmounted(() => {
-    window.removeEventListener("scroll", handleScroll);
-  });
-  </script>
+  window.addEventListener("scroll", handleScroll);
+});
+
+onUnmounted(() => {
+  window.removeEventListener("scroll", handleScroll);
+});
+</script>
+
 
 <template>
   <header :class="['header', { shrunk: isShrunk, dark: isDarkMode }]">
@@ -52,7 +62,7 @@ import LogoImg from "@/assets/logo.png";
 
     <!-- Логирање & Мод за темна/светла тема -->
     <div class="auth">
-      <RouterLink v-if="isLoggedIn" to="/edit" class="user-icon">
+      <RouterLink v-if="isLoggedIn" to="/user-profile" class="user-icon">
         <font-awesome-icon :icon="['fas', 'user']" />
       </RouterLink>
       <RouterLink v-else to="/login" class="login-btn">Најави се</RouterLink>
@@ -74,7 +84,7 @@ import LogoImg from "@/assets/logo.png";
         <RouterLink v-if="isLoggedIn" to="/favourite" @click="toggleMenu">Омилени</RouterLink>
         <RouterLink v-if="!isLoggedIn" to="/apply" @click="toggleMenu">Стани мајстор</RouterLink>
         <RouterLink v-else to="/seller-dashboard" @click="toggleMenu">Табла</RouterLink>
-        <RouterLink v-if="isLoggedIn" to="/edit" @click="toggleMenu">Профил</RouterLink>
+        <RouterLink v-if="isLoggedIn" to="/user-profile" @click="toggleMenu">Профил</RouterLink>
         <RouterLink v-else to="/login" @click="toggleMenu">Најави се</RouterLink>
         <button @click="toggleDarkMode" class="theme-toggle-mobile">
           <font-awesome-icon :icon="isDarkMode ? ['fas', 'sun'] : ['fas', 'moon']" />

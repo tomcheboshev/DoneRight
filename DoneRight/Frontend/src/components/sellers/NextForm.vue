@@ -47,8 +47,8 @@ const submitMasterProfile = async () => {
   }
 
   try {
-    // Add data to the 'masters' collection
-    const docRef = await addDoc(collection(db, "masters"), {
+    // Add data to the 'services' collection
+    const docRef = await addDoc(collection(db, "services"), {
       service: form.value.service,
       description: form.value.description,
       experience: form.value.experience,

@@ -1,6 +1,7 @@
 <script setup>
 import { ref } from "vue";
 import { useRouter } from "vue-router";
+import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
 
 const router = useRouter();
 
@@ -10,24 +11,22 @@ const form = ref({
 });
 
 const handleLogin = async () => {
+  const auth = getAuth();
   try {
-    const response = await fetch("http://localhost:5000/login", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(form.value),
-    });
+    const userCredential = await signInWithEmailAndPassword(
+      auth,
+      form.value.email,
+      form.value.password
+    );
 
-    const data = await response.json();
-
-    if (response.ok) {
-      alert("Login successful!");
-      localStorage.setItem("token", data.token);
-      router.push("/dashboard");
-    } else {
-      alert(data.error);
-    }
+    const user = userCredential.user;
+    alert("Најавата беше успешна!");
+    // Optionally store token or user info
+    // localStorage.setItem("token", await user.getIdToken());
+    router.push("/"); // or wherever you want to redirect
   } catch (error) {
-    console.error("Error logging in:", error);
+    console.error("Login error:", error);
+    alert("Грешка при најава: " + error.message);
   }
 };
 
