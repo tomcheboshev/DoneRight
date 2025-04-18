@@ -1,12 +1,12 @@
 <script setup>
 import { ref } from "vue";
 import { useRouter } from "vue-router";
-import { db } from "@/firebase"; // Your Firebase config file
+import { db } from "@/firebase"; 
 import { collection, addDoc, Timestamp } from "firebase/firestore";
-import { getAuth } from "firebase/auth"; // Import Firebase Authentication
+import { getAuth } from "firebase/auth"; 
 
 const router = useRouter();
-const auth = getAuth(); // Initialize Firebase Authentication
+const auth = getAuth(); 
 
 const form = ref({
   service: "",

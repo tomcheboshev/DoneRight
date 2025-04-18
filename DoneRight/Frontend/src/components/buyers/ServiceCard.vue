@@ -85,61 +85,78 @@
 </template>
 
 <script setup>
-import { ref, computed } from "vue";
+import { ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
-import img from "@/assets/lok.png";
+import { collection, getDocs, query, where, doc, getDoc } from "firebase/firestore";
+import { db } from "@/firebase";
 
-// Search Logic
-const searchService = ref("");
-const searchCity = ref("");
-const showServiceDropdown = ref(false);
-const showCityDropdown = ref(false);
-
-const servicesList = ["Електричар", "Водоводџија", "Молер", "Градинар", "Керамичар"];
-const citiesList = ["Скопје", "Битола", "Куманово", "Охрид", "Штип"];
-
-const filteredServices = ref([...servicesList]);
-const filteredCities = ref([...citiesList]);
-
-const filterServices = () => {
-  filteredServices.value = searchService.value
-    ? servicesList.filter((service) => service.toLowerCase().startsWith(searchService.value.toLowerCase()))
-    : [...servicesList];
-};
-
-const filterCities = () => {
-  filteredCities.value = searchCity.value
-    ? citiesList.filter((city) => city.toLowerCase().startsWith(searchCity.value.toLowerCase()))
-    : [...citiesList];
-};
-
-const selectService = (service) => {
-  searchService.value = service;
-  showServiceDropdown.value = false;
-};
-
-const selectCity = (city) => {
-  searchCity.value = city;
-  showCityDropdown.value = false;
-};
-
-const hideDropdown = (type) => {
-  setTimeout(() => {
-    if (type === "service") showServiceDropdown.value = false;
-    if (type === "city") showCityDropdown.value = false;
-  }, 200);
-};
-
-// Service Cards Logic
-const router = useRouter();
-const services = ref([
-  { id: 1, name: "John", lastName: "Doe", job: "Електричар", location: "Скопје", rating: 4.8, image: img },
-  { id: 2, name: "Томче", lastName: "Бошев", job: "Електричар", location: "Битола", rating: 4.5, image: img },
-  { id: 3, name: "David", lastName: "Johnson", job: "Дрводелец", location: "Прилеп", rating: 4.7, image: img },
-  { id: 4, name: "Michael", lastName: "Brown", job: "Механичар", location: "Куманово", rating: 4.6, image: img },
-]);
-
+const services = ref([]);
 const favorites = ref([]);
+const router = useRouter();
+
+const loadServices = async () => {
+  try {
+    const serviceSnapshot = await getDocs(collection(db, "services"));
+
+    const enrichedServices = await Promise.all(serviceSnapshot.docs.map(async (docSnap) => {
+      const serviceData = docSnap.data();
+      const userUid = serviceData.userId;
+
+      let firstName = "Име";
+      let lastName = "";
+      let image = new URL("@/assets/lok.png", import.meta.url).href;
+      let location = "Непознато";
+
+      if (userUid) {
+        // 🔍 Query users collection by "uid" field
+        const userQuery = query(collection(db, "users"), where("uid", "==", userUid));
+        const userSnapshot = await getDocs(userQuery);
+
+        if (!userSnapshot.empty) {
+          const userData = userSnapshot.docs[0].data();
+          firstName = userData.firstName || firstName;
+          lastName = userData.lastName || lastName;
+          image = userData.image || image;
+          location = userData.city || location;
+        }
+
+        const profilePicRef = doc(db, "userProfilePictures", userUid);
+        const profilePicSnap = await getDoc(profilePicRef);
+
+        if (profilePicSnap.exists()) {
+          const picData = profilePicSnap.data();
+          if (picData.profilePicture) {
+            image = picData.profilePicture;
+          }
+        }
+      }
+
+      return {
+        id: docSnap.id,
+        name: firstName,
+        lastName,
+        job: serviceData.service || "Услуга",
+        image,
+        location,
+        rating: 5, // Hardcoded until ratings are implemented
+      };
+    }));
+
+    services.value = enrichedServices;
+  } catch (error) {
+    console.error("Failed to load services:", error);
+  }
+};
+
+const getJobIcon = (job) => {
+  const icons = {
+    "Електричар": "⚡",
+    "Водоводџија": "🔧",
+    "Дрводелец": "🪵",
+    "Механичар": "🔩",
+  };
+  return icons[job] || "💼";
+};
 
 const toggleFavorite = (service) => {
   const index = favorites.value.findIndex((fav) => fav.id === service.id);
@@ -156,25 +173,16 @@ const goToDetails = (service) => {
 
 const isFavorite = (service) => favorites.value.some((fav) => fav.id === service.id);
 
-const getJobIcon = (job) => {
-  const icons = {
-    "Електричар": "⚡",
-    "Водоводџија": "🔧",
-    "Дрводелец": "🪵",
-    "Механичар": "🔩",
-  };
-  return icons[job] || "💼";
-};
+// Display all services for now
+const filteredServicesList = services;
 
-// Computed Filtered Services Based on City and Service
-const filteredServicesList = computed(() => {
-  return services.value.filter(service => {
-    const matchesService = !searchService.value || service.job.toLowerCase().includes(searchService.value.toLowerCase());
-    const matchesCity = !searchCity.value || service.location.toLowerCase().includes(searchCity.value.toLowerCase());
-    return matchesService && matchesCity;
-  });
+onMounted(() => {
+  loadServices();
 });
 </script>
+
+
+
 
 <style scoped>
 /* Shared Styles for both Sections */

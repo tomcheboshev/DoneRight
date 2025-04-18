@@ -1,8 +1,83 @@
-<script setup>
-import { ref } from "vue";
-import { useRouter } from "vue-router";
+<template>
+  <div class="background">
+    <div class="overlay"></div>
+    <div class="edit-profile-container">
+      <h1 class="title">Aжурирај Профил</h1>
 
-const router = useRouter();
+      <form @submit.prevent="submitChanges" class="edit-profile-form">
+        <div class="form-grid">
+          <div v-if="profile.profilePicture" class="profile-preview-container">
+            <label for="imageUpload">
+              <img
+                :src="profile.profilePicture"
+                alt="Profile Picture"
+                class="profile-preview"
+                title="Кликни за да смениш"
+              />
+            </label>
+            <input
+              id="imageUpload"
+              type="file"
+              accept="image/*"
+              style="display: none"
+              @change="handleImageChange"
+            />
+          </div>
+
+          <div class="input-group">
+            <input type="text" id="firstName" v-model="profile.firstName" required />
+            <label for="firstName">Име</label>
+          </div>
+
+          <div class="input-group">
+            <input type="text" id="lastName" v-model="profile.lastName" required />
+            <label for="lastName">Презиме</label>
+          </div>
+
+          <div class="input-group">
+            <input type="email" id="email" v-model="profile.email" required />
+            <label for="email">Е-пошта</label>
+          </div>
+
+          <div class="input-group">
+            <input type="text" id="phone" v-model="profile.phone" required />
+            <label for="phone">Телефон</label>
+          </div>
+
+          <div class="input-group">
+            <input type="text" id="city" v-model="profile.city" required />
+            <label for="city">Град</label>
+          </div>
+        </div>
+
+        <button type="submit" class="submit-btn">Зачувај Промени</button>
+      </form>
+    </div>
+  </div>
+</template>
+
+<script setup>
+import { ref, onMounted } from "vue"
+import { useRouter } from "vue-router"
+import { getAuth, onAuthStateChanged, updateEmail } from "firebase/auth"
+import {
+  collection,
+  getDocs,
+  query,
+  where,
+  doc,
+  updateDoc,
+  getDoc
+} from "firebase/firestore"
+import {
+  getStorage,
+  ref as storageRef,
+  uploadBytes,
+  getDownloadURL
+} from "firebase/storage"
+import { db } from "@/firebase"
+
+const router = useRouter()
 
 const profile = ref({
   firstName: "",
@@ -10,74 +85,96 @@ const profile = ref({
   email: "",
   phone: "",
   city: "",
-  profilePicture: null,
-});
+  profilePicture: ""
+})
 
-const handleFileChange = (event) => {
-  const file = event.target.files[0];
-  if (file) {
-    profile.value.profilePicture = URL.createObjectURL(file);
+const userDocId = ref(null)
+
+onMounted(() => {
+  const auth = getAuth()
+  onAuthStateChanged(auth, async (user) => {
+    if (user) {
+      profile.value.email = user.email
+
+      const q = query(collection(db, "users"), where("uid", "==", user.uid))
+      const snapshot = await getDocs(q)
+
+      if (!snapshot.empty) {
+        const userData = snapshot.docs[0].data()
+        userDocId.value = snapshot.docs[0].id
+
+        profile.value.firstName = userData.firstName || ""
+        profile.value.lastName = userData.lastName || ""
+        profile.value.phone = userData.phone || ""
+        profile.value.city = userData.city || ""
+
+        const picRef = doc(db, "userProfilePictures", user.uid)
+        const picSnap = await getDoc(picRef)
+        if (picSnap.exists()) {
+          profile.value.profilePicture = picSnap.data().profilePicture || ""
+        }
+      }
+    }
+  })
+})
+
+const handleImageChange = async (event) => {
+  const file = event.target.files[0]
+  if (!file) return
+
+  const auth = getAuth()
+  const currentUser = auth.currentUser
+  const storage = getStorage()
+
+  const fileRef = storageRef(storage, `profile_pictures/${currentUser.uid}`)
+
+  try {
+    await uploadBytes(fileRef, file)
+    const url = await getDownloadURL(fileRef)
+    profile.value.profilePicture = url
+
+    await updateDoc(doc(db, "userProfilePictures", currentUser.uid), {
+      profilePicture: url
+    })
+  } catch (err) {
+    console.error("Error uploading image:", err)
+    alert("Неуспешно поставување на слика.")
   }
-};
+}
 
-const submitChanges = () => {
-  console.log("Profile updated:", profile.value);
-  alert("Your profile has been updated!");
-  router.push("/profile");
-};
+const submitChanges = async () => {
+  if (!userDocId.value) return
+
+  const auth = getAuth()
+  const currentUser = auth.currentUser
+
+  try {
+    if (profile.value.email !== currentUser.email) {
+      await updateEmail(currentUser, profile.value.email)
+    }
+
+    await updateDoc(doc(db, "users", userDocId.value), {
+      firstName: profile.value.firstName,
+      lastName: profile.value.lastName,
+      phone: profile.value.phone,
+      city: profile.value.city,
+      email: profile.value.email
+    })
+
+    alert("Промените се успешно зачувани!")
+    router.push("/user-profile")
+  } catch (err) {
+    if (err.code === "auth/requires-recent-login") {
+      alert("За да ја промените е-поштата, прво најавете се повторно.")
+    } else {
+      console.error("Error updating profile:", err)
+      alert("Неуспешно ажурирање на профилот.")
+    }
+  }
+}
 </script>
 
-<template>
-  <div class="background">
-    <div class="overlay"></div>
-    <div class="edit-profile-container">
-      <h1 class="title">Edit Your Profile</h1>
-
-      <form @submit.prevent="submitChanges" class="edit-profile-form">
-        <div class="form-grid">
-          <div class="input-group">
-            <input type="text" id="firstName" v-model="profile.firstName" required />
-            <label for="firstName">First Name</label>
-          </div>
-
-          <div class="input-group">
-            <input type="text" id="lastName" v-model="profile.lastName" required />
-            <label for="lastName">Last Name</label>
-          </div>
-
-          <div class="input-group">
-            <input type="email" id="email" v-model="profile.email" required />
-            <label for="email">Email</label>
-          </div>
-
-          <div class="input-group">
-            <input type="text" id="phone" v-model="profile.phone" required />
-            <label for="phone">Phone</label>
-          </div>
-
-          <div class="input-group">
-            <input type="text" id="city" v-model="profile.city" required />
-            <label for="city">City</label>
-          </div>
-
-          <div class="input-group file-upload">
-            <input type="file" id="profilePicture" @change="handleFileChange" />
-            <label for="profilePicture">Upload Profile Picture</label>
-          </div>
-
-          <div v-if="profile.profilePicture" class="profile-preview-container">
-            <img :src="profile.profilePicture" alt="Profile Picture" class="profile-preview" />
-          </div>
-        </div>
-
-        <button type="submit" class="submit-btn">Save Changes</button>
-      </form>
-    </div>
-  </div>
-</template>
-
 <style scoped>
-/* Background */
 .background {
   position: relative;
   width: 100%;
@@ -89,7 +186,6 @@ const submitChanges = () => {
   overflow: hidden;
 }
 
-/* Overlay Effect */
 .overlay {
   position: absolute;
   width: 100%;
@@ -98,7 +194,6 @@ const submitChanges = () => {
   backdrop-filter: blur(10px);
 }
 
-/* Form Container */
 .edit-profile-container {
   position: relative;
   background-color: rgba(255, 255, 255, 0.1);
@@ -112,7 +207,6 @@ const submitChanges = () => {
   border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
-/* Title */
 .title {
   font-size: 24px;
   font-weight: 700;
@@ -120,13 +214,11 @@ const submitChanges = () => {
   margin-bottom: 15px;
 }
 
-/* Form Grid */
 .form-grid {
   display: grid;
   gap: 12px;
 }
 
-/* Input Fields */
 .input-group {
   position: relative;
   width: 92%;
@@ -144,14 +236,12 @@ const submitChanges = () => {
   margin-top: 6px;
 }
 
-/* Highlight border on focus */
 .input-group input:focus {
   background: rgba(255, 255, 255, 0.3);
   outline: none;
   border-color: #ffc107;
 }
 
-/* Floating Label */
 .input-group label {
   position: absolute;
   top: 54%;
@@ -165,9 +255,9 @@ const submitChanges = () => {
   padding: 0 5px;
 }
 
-/* Floating Label Effect */
 .input-group input:focus + label,
-.input-group input:valid + label {
+.input-group input:valid + label,
+.input-group input[readonly] + label {
   top: -2px;
   left: 5px;
   font-size: 12px;
@@ -175,31 +265,11 @@ const submitChanges = () => {
   padding: 0 5px;
 }
 
-/* File Upload */
-.file-upload input {
-  display: none;
-}
-
-.file-upload label {
-  display: block;
-  padding: 12px;
-  text-align: center;
-  background: rgba(255, 255, 255, 0.2);
-  color: white;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: 0.3s;
-}
-
-.file-upload label:hover {
-  background: rgba(255, 255, 255, 0.3);
-}
-
-/* Profile Picture Preview */
 .profile-preview-container {
   display: flex;
   justify-content: center;
   margin-top: 10px;
+  cursor: pointer;
 }
 
 .profile-preview {
@@ -210,7 +280,6 @@ const submitChanges = () => {
   border: 2px solid #ffc107;
 }
 
-/* Submit Button */
 .submit-btn {
   width: 100%;
   padding: 14px;
@@ -229,7 +298,6 @@ const submitChanges = () => {
   background: linear-gradient(90deg, #ffb400, #ffdf70);
 }
 
-/* Responsive Design */
 @media (max-width: 480px) {
   .edit-profile-container {
     padding: 20px;

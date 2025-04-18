@@ -24,7 +24,7 @@
           />
           <transition name="fade">
             <ul v-if="showServiceDropdown" class="dropdown">
-              <li v-for="service in filteredServices" :key="service" @mousedown="selectService(service)">
+              <li v-for="service in filteredServices.value" :key="service" @mousedown="selectService(service)">
                 {{ service }}
               </li>
             </ul>
@@ -44,11 +44,23 @@
           />
           <transition name="fade">
             <ul v-if="showCityDropdown" class="dropdown">
-              <li v-for="city in filteredCities" :key="city" @mousedown="selectCity(city)">
+              <li v-for="city in filteredCities.value" :key="city" @mousedown="selectCity(city)">
                 {{ city }}
               </li>
             </ul>
           </transition>
+        </div>
+      </div>
+
+      <!-- Service Results -->
+      <div class="results-container" v-if="visibleServices.length">
+        <h2>Резултати</h2>
+        <div class="result-card" v-for="service in visibleServices" :key="service.id">
+          <h3>{{ service.service }}</h3>
+          <p><strong>Опис:</strong> {{ service.description }}</p>
+          <p><strong>Искуство:</strong> {{ service.experience }} години</p>
+          <p><strong>Цена:</strong> {{ service.price }} ден.</p>
+          <p><strong>Град:</strong> {{ service.city || 'Непознато' }}</p>
         </div>
       </div>
     </div>
@@ -56,29 +68,52 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { ref, computed, onMounted } from "vue";
+import { collection, getDocs } from "firebase/firestore";
+import { db } from "@/firebase";
 
+// Input & dropdown control
 const searchService = ref("");
 const searchCity = ref("");
 const showServiceDropdown = ref(false);
 const showCityDropdown = ref(false);
 
-const services = ["Електричар", "Водоводџија", "Молер", "Градинар", "Керамичар"];
-const cities = ["Скопје", "Битола", "Куманово", "Охрид", "Штип"];
+// Data from Firestore
+const allServices = ref([]);
+const filteredServices = ref([]);
+const filteredCities = ref([]);
 
-const filteredServices = ref([...services]);
-const filteredCities = ref([...cities]);
+const loadServices = async () => {
+  const querySnapshot = await getDocs(collection(db, "services"));
+  allServices.value = querySnapshot.docs.map((doc) => ({
+    id: doc.id,
+    ...doc.data(),
+  }));
 
+  // Initial dropdown content
+  filteredServices.value = [...new Set(allServices.value.map((s) => s.service))];
+  filteredCities.value = [...new Set(allServices.value.map((s) => s.city || "Непознато"))];
+};
+
+// Dropdown filtering
 const filterServices = () => {
   filteredServices.value = searchService.value
-    ? services.filter((service) => service.toLowerCase().startsWith(searchService.value.toLowerCase()))
-    : [...services];
+    ? [...new Set(allServices.value
+        .map((s) => s.service)
+        .filter((service) =>
+          service.toLowerCase().startsWith(searchService.value.toLowerCase())
+        ))]
+    : [...new Set(allServices.value.map((s) => s.service))];
 };
 
 const filterCities = () => {
   filteredCities.value = searchCity.value
-    ? cities.filter((city) => city.toLowerCase().startsWith(searchCity.value.toLowerCase()))
-    : [...cities];
+    ? [...new Set(allServices.value
+        .map((s) => s.city || "Непознато")
+        .filter((city) =>
+          city.toLowerCase().startsWith(searchCity.value.toLowerCase())
+        ))]
+    : [...new Set(allServices.value.map((s) => s.city || "Непознато"))];
 };
 
 const selectService = (service) => {
@@ -97,6 +132,23 @@ const hideDropdown = (type) => {
     if (type === "city") showCityDropdown.value = false;
   }, 200);
 };
+
+// Services to display
+const visibleServices = computed(() => {
+  return allServices.value.filter((service) => {
+    const matchesService = searchService.value
+      ? service.service.toLowerCase().includes(searchService.value.toLowerCase())
+      : true;
+    const matchesCity = searchCity.value
+      ? (service.city || "").toLowerCase().includes(searchCity.value.toLowerCase())
+      : true;
+    return matchesService && matchesCity;
+  });
+});
+
+onMounted(() => {
+  loadServices();
+});
 </script>
 
 <style scoped>
@@ -215,8 +267,24 @@ const hideDropdown = (type) => {
   transition: opacity 0.3s ease;
 }
 
-.fade-enter, .fade-leave-to {
+.fade-enter,
+.fade-leave-to {
   opacity: 0;
+}
+
+/* Results */
+.results-container {
+  margin-top: 30px;
+  color: white;
+}
+
+.result-card {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 20px;
+  border-radius: 12px;
+  margin-bottom: 15px;
+  text-align: left;
 }
 
 /* Responsive */
