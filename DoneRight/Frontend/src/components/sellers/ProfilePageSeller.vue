@@ -1,302 +1,183 @@
-<script setup>
-import { ref } from "vue";
-import { useRouter } from "vue-router";
-import { db, auth } from "@/firebase";
-import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
-import { collection, addDoc } from "firebase/firestore";
-
-// Form Data
-const form = ref({
-  firstName: "",
-  lastName: "",
-  email: "",
-  phone: "",
-  city: "",
-  address: "",
-  password: "",
-});
-
-const router = useRouter();
-
-const submitApplication = async () => {
-  try {
-    // Register User with Firebase Authentication
-    const userCredential = await createUserWithEmailAndPassword(
-      auth,
-      form.value.email,
-      form.value.password
-    );
-
-    // Update Firebase Authentication profile with display name
-    await updateProfile(userCredential.user, {
-      displayName: `${form.value.firstName} ${form.value.lastName}`,
-    });
-
-    // Add user data to Firestore (including the rest of the form details)
-    const userRef = collection(db, "users");
-    await addDoc(userRef, {
-      firstName: form.value.firstName,
-      lastName: form.value.lastName,
-      email: form.value.email,
-      phone: form.value.phone,
-      city: form.value.city,
-      address: form.value.address,
-      uid: userCredential.user.uid, // Use the Firebase UID for the user
-      createdAt: new Date(), // Timestamp when user was created
-    });
-
-    alert("Успешна регистрација!");
-    router.push("/next-form"); // Redirect to next form
-  } catch (error) {
-    console.error("Грешка при регистрација:", error);
-    alert(error.message);
-  }
-};
-
-const redirectToLogin = () => {
-  router.push("/login");
-};
-</script>
-
 <template>
-  <div class="background">
-    <div class="overlay"></div>
-    <div class="become-master-container">
-      <h1 class="title">Стани Мајстор</h1>
-      <p class="subtitle">Придружете се и споделете ги вашите знаења со нас.</p>
+  <v-app>
+    <div class="background">
+      <div class="overlay"></div>
+      <v-container class="form-container" fluid>
+        <v-card class="form-card" elevation="10">
+          <v-card-title class="text-center text-yellow-darken-2 text-h5 font-weight-bold">
+            Стани Мајстор
+          </v-card-title>
+          <v-card-subtitle class="text-center mb-6 text-white">
+            Придружете се и споделете ги вашите знаења со нас.
+          </v-card-subtitle>
 
-      <form @submit.prevent="submitApplication" class="application-form">
-        <div class="form-grid">
-          <div class="input-group">
-            <input type="text" id="firstName" v-model="form.firstName" required />
-            <label for="firstName">Име</label>
-          </div>
+          <v-form @submit.prevent="submitApplication" class="px-4">
+            <v-text-field
+              v-model="form.firstName"
+              label="Име"
+              variant="outlined"
+              density="comfortable"
+              color="warning"
+              class="mb-4"
+              hide-details
+              required
+            />
 
-          <div class="input-group">
-            <input type="text" id="lastName" v-model="form.lastName" required />
-            <label for="lastName">Презиме</label>
-          </div>
+            <v-text-field
+              v-model="form.lastName"
+              label="Презиме"
+              variant="outlined"
+              density="comfortable"
+              color="warning"
+              class="mb-4"
+              hide-details
+              required
+            />
 
-          <div class="input-group">
-            <input type="email" id="email" v-model="form.email" required />
-            <label for="email">Емајл адреса</label>
-          </div>
+            <v-text-field
+              v-model="form.email"
+              label="Емајл адреса"
+              type="email"
+              variant="outlined"
+              density="comfortable"
+              color="warning"
+              class="mb-4"
+              hide-details
+              required
+            />
 
-          <div class="input-group">
-            <input type="text" id="phone" v-model="form.phone" required />
-            <label for="phone">Телефонски број</label>
-          </div>
+            <v-text-field
+              v-model="form.phone"
+              label="Телефонски број"
+              type="text"
+              variant="outlined"
+              density="comfortable"
+              color="warning"
+              class="mb-4"
+              hide-details
+              required
+            />
 
-          <div class="input-group">
-            <input type="text" id="city" v-model="form.city" required />
-            <label for="city">Град</label>
-          </div>
+            <!-- DROPDOWN -->
+            <v-select
+              v-model="form.city"
+              :items="cities"
+              label="Град"
+              variant="outlined"
+              density="comfortable"
+              color="warning"
+              class="mb-4"
+              hide-details
+              required
+            />
 
-          <div class="input-group">
-            <input type="password" id="password" v-model="form.password" required />
-            <label for="password">Лозинка</label>
-          </div>
-        </div>
+            <v-text-field
+              v-model="form.password"
+              label="Лозинка"
+              type="password"
+              variant="outlined"
+              density="comfortable"
+              color="warning"
+              class="mb-5"
+              hide-details
+              required
+            />
 
-        <p class="account-link">
-          Имате веќе сметка? <span @click="redirectToLogin" class="link">Логирајте се тука</span>
-        </p>
+            <div class="account-link text-white text-caption mb-5">
+              Имате веќе сметка?
+              <span class="link" @click="redirectToLogin">Логирајте се тука</span>
+            </div>
 
-        <button type="submit" class="submit-btn">Продолжи</button>
-      </form>
+            <v-btn
+              type="submit"
+              color="warning"
+              block
+              size="large"
+              class="text-white font-weight-bold"
+            >
+              Продолжи
+            </v-btn>
+          </v-form>
+        </v-card>
+      </v-container>
     </div>
-  </div>
+  </v-app>
 </template>
 
-<style scoped>
-/* Background Animation */
-.background {
-  position: relative;
-  width: 100%;
-  height: 100vh;
-  background-color: #212529;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  overflow: hidden;
+<script setup>
+import { ref } from 'vue'
+import { useRouter } from 'vue-router'
+
+const form = ref({
+  firstName: '',
+  lastName: '',
+  email: '',
+  phone: '',
+  city: '',
+  password: '',
+})
+
+const cities = [
+  'Скопје', 'Битола', 'Тетово', 'Куманово', 'Прилеп', 'Охрид', 'Гостивар', 'Штип',
+  'Кавадарци', 'Велес', 'Кочани', 'Струмица', 'Гевгелија', 'Кичево', 'Струга',
+  'Неготино', 'Ресен', 'Кратово', 'Крива Паланка', 'Дебар', 'Берово', 'Делчево',
+  'Виница', 'Пробиштип', 'Свети Николе', 'Богданци', 'Валандово', 'Демир Хисар',
+  'Македонски Брод', 'Крушево', 'Пехчево', 'Радовиш'
+]
+
+const router = useRouter()
+
+const submitApplication = () => {
+  router.push('/next-form')
 }
 
-/* Overlay for a sleek effect */
+const redirectToLogin = () => {
+  router.push('/login')
+}
+</script>
+
+<style scoped>
+.background {
+  background-color: #212529;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
 .overlay {
   position: absolute;
   width: 100%;
   height: 100%;
-  background: rgba(0, 0, 0, 0.3);
   backdrop-filter: blur(10px);
+  background: rgba(0, 0, 0, 0.3);
+  z-index: 0;
 }
-
-/* Form Container */
-.become-master-container {
-  position: relative;
-  background-color: rgba(255, 255, 255, 0.1);
-  border-radius: 12px;
-  padding: 30px;
-  max-width: 400px;
-  width: 100%;
-  box-shadow: 0 5px 25px rgba(0, 0, 0, 0.3);
-  text-align: center;
-  backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-}
-
-/* Title & Subtitle */
-.title {
-  font-size: 24px;
-  font-weight: 700;
-  color: #ffc107;
-}
-
-.subtitle {
-  font-size: 14px;
-  color: #ddd;
-  margin-bottom: 20px;
-}
-
-/* Form Grid */
-.form-grid {
-  display: grid;
-  gap: 12px;
-}
-
-/* Input Fields */
-.input-group {
-  position: relative;
-  width: 92%;
-}
-
-.input-group input {
-  width: 100%;
-  padding: 14px;
-  border: 2px solid rgba(255, 255, 255, 0.3);
-  border-radius: 6px;
-  font-size: 14px;
-  background: rgba(255, 255, 255, 0.2);
-  color: white;
-  transition: 0.3s;
-  margin-top: 6px;
-}
-
-/* Highlight border on focus */
-.input-group input:focus {
-  background: rgba(255, 255, 255, 0.3);
-  outline: none;
-  border-color: #ffc107;
-}
-
-/* Floating Label */
-.input-group label {
-  position: absolute;
-  top: 54%;
-  left: 12px;
-  transform: translateY(-50%);
-  font-size: 14px;
-  color: #ddd;
-  transition: 0.3s;
-  pointer-events: none;
-  background: transparent;
-  padding: 0 5px;
-}
-
-/* When input is focused or has text */
-.input-group input:focus + label,
-.input-group input:valid + label {
-  top: -2px; /* Moves label up */
-  left: 5px;
-  font-size: 12px;
-  color: white; /* Matches form background */
-  padding: 0 5px;
-  
-}
-
-/* 👇 This removes ONLY the part of the border behind the label */
-.input-group::before {
-  content: "";
-  position: absolute;
-  top: 8px;
-  left: 8px;
-  width: 60px; /* Adjust based on label width */
-  height: 14px;
-  background-color: #212529; /* Same as form background */
+.form-container {
   z-index: 1;
-  transition: 0.3s;
-  opacity: 0;
+  display: flex;
+  justify-content: center;
+}
+.form-card {
+  background-color: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(12px);
+  border-radius: 16px;
+  padding: 30px 20px;
+  max-width: 420px;
+  width: 100%;
+  color: white;
 }
 
-/* Show the "border cutout" when label is up */
-.input-group input:focus ~ ::before,
-.input-group input:valid ~ ::before {
-  opacity: 1;
+/* Link styling */
+.account-link{
+  text-align: center;
 }
-
-/* Account Link */
-.account-link {
-  font-size: 14px;
-  margin-top: 25px;
-  color: #ddd;
-}
-
 .account-link .link {
   color: #ffc107;
   cursor: pointer;
   font-weight: 600;
 }
-
 .account-link .link:hover {
   text-decoration: underline;
-}
-
-/* Submit Button */
-.submit-btn {
-  width: 100%;
-  padding: 14px;
-  background: linear-gradient(90deg, #ff9d00, #ffcd38);
-  color: white;
-  font-size: 16px;
-  font-weight: 600;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: 0.3s;
-  margin-top: 15px;
-}
-
-.submit-btn:hover {
-  background: linear-gradient(90deg, #ffb400, #ffdf70);
-}
-
-/* Responsiveness */
-@media (max-width: 480px) {
-  .become-master-container {
-    padding: 20px;
-    max-width: 75%;
-    margin-top: 30px;
-  }
-
-  .title {
-    font-size: 22px;
-  }
-
-  .input-group input {
-    font-size: 16px;
-    padding: 12px;
-  }
-  
-  .input-group{
-    width: 91%;
-  }
-
-  .input-group label {
-    font-size: 13px;
-  }
-
-  .submit-btn {
-    font-size: 14px;
-    padding: 12px;
-  }
 }
 </style>

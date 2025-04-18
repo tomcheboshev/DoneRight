@@ -1,138 +1,90 @@
-<template>
-  <div>
-    <!-- Preloader -->
-    <PreloaderSection v-if="isLoading" />
-
-    <!-- Search Section -->
-    <div class="background">
-      <div class="overlay"></div>
-
-      <div class="container">
-        <!-- Title Section -->
-        <div class="title">
-          <h1>Најди Мајстор</h1>
-          <p class="subtitle">Пронајди најдобрите професионалци во твојот град</p>
-        </div>
-
-        <!-- Input Fields -->
-        <div class="inputs-container">
-          <!-- Service Dropdown -->
-          <div class="input-group">
-            <input
-              type="text"
-              id="service"
-              v-model="searchService"
-              @input="filterServices"
-              @focus="showServiceDropdown = true"
-              @blur="hideDropdown('service')"
-              placeholder="Пребарај услуга..."
-            />
-            <transition name="fade">
-              <ul v-if="showServiceDropdown" class="dropdown">
-                <li v-for="service in filteredServices" :key="service" @mousedown="selectService(service)">
-                  {{ service }}
-                </li>
-              </ul>
-            </transition>
-          </div>
-
-          <!-- City Dropdown -->
-          <div class="input-group">
-            <input
-              type="text"
-              id="city"
-              v-model="searchCity"
-              @input="filterCities"
-              @focus="showCityDropdown = true"
-              @blur="hideDropdown('city')"
-              placeholder="Внеси град..."
-            />
-            <transition name="fade">
-              <ul v-if="showCityDropdown" class="dropdown">
-                <li v-for="city in filteredCities" :key="city" @mousedown="selectCity(city)">
-                  {{ city }}
-                </li>
-              </ul>
-            </transition>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Service Cards Section -->
-    <div class="services-container">
-      <div v-for="service in filteredServicesList" :key="service.id" class="service-card">
-        <div class="image-container">
-          <img :src="service.image" :alt="`${service.name} ${service.lastName}`" class="profile-pic" />
-        </div>
-
-        <div class="info">
-          <h3>{{ service.name }} {{ service.lastName }}</h3>
-          <p class="job-title">
-            <span class="job-badge">{{ getJobIcon(service.job) }}</span>
-            {{ service.job }}
-          </p>
-          <p class="location">📍 {{ service.location }}</p>
-          <p class="rating">⭐ {{ service.rating }}/5</p>
-
-          <div class="btn-container">
-            <button class="contact-btn" @click="goToDetails(service)">Контактирај ме</button>
-            <button class="favorite-btn" @click="toggleFavorite(service)">
-              <span :class="{ favorite: isFavorite(service) }">★</span>
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</template>
-
 <script setup>
-import PreloaderSection from '@/components/common/PreloaderSection.vue';
-import { ref, onMounted } from "vue";
-import { useRouter } from "vue-router";
-import { collection, getDocs, query, where, doc, getDoc } from "firebase/firestore";
-import { db } from "@/firebase";
+import { ref, onMounted, computed } from 'vue'
+import { useRouter } from 'vue-router'
+import { collection, getDocs, query, where, doc, getDoc } from 'firebase/firestore'
+import { db } from '@/firebase'
+// import PreloaderSection from '@/components/common/PreloaderSection.vue'
 
-const services = ref([]);
-const favorites = ref([]);
-const isLoading = ref(true);
-const router = useRouter();
+const router = useRouter()
+
+const services = ref([])
+const favorites = ref([])
+const isLoading = ref(true)
+const searchService = ref('')
+const searchCity = ref('')
+
+const allServices = [
+  'Електричар', 'Водоводџија', 'Молер', 'Механичар', 'Дрводелец', 'Техничар',
+  'Инженер', 'Монтер', 'Чистач'
+]
+
+const cities = [
+  'Скопје', 'Битола', 'Тетово', 'Куманово', 'Прилеп', 'Охрид', 'Гостивар', 'Штип',
+  'Кавадарци', 'Велес', 'Кочани', 'Струмица', 'Гевгелија', 'Кичево', 'Струга',
+  'Неготино', 'Ресен', 'Кратово', 'Крива Паланка', 'Дебар', 'Берово', 'Делчево',
+  'Виница', 'Пробиштип', 'Свети Николе', 'Богданци', 'Валандово', 'Демир Хисар',
+  'Македонски Брод', 'Крушево', 'Пехчево', 'Радовиш'
+]
+
+const filteredServicesList = computed(() =>
+  services.value.filter(s =>
+    (!searchCity.value || s.location === searchCity.value) &&
+    (!searchService.value || s.job.toLowerCase().includes(searchService.value.toLowerCase()))
+  )
+)
+
+const getJobIcon = (job) => {
+  const icons = {
+    'Електричар': '⚡',
+    'Водоводџија': '🔧',
+    'Дрводелец': '🪚',
+    'Механичар': '🔩'
+  }
+  return icons[job] || '💼'
+}
+
+const toggleFavorite = (service) => {
+  const index = favorites.value.findIndex(f => f.id === service.id)
+  if (index === -1) favorites.value.push(service)
+  else favorites.value.splice(index, 1)
+}
+
+const isFavorite = (service) => favorites.value.some(f => f.id === service.id)
+
+const goToDetails = (service) => {
+  router.push({ path: `/service/${service.id}` })
+}
 
 const loadServices = async () => {
-  isLoading.value = true;
+  isLoading.value = true
   try {
-    const serviceSnapshot = await getDocs(collection(db, "services"));
+    const serviceSnapshot = await getDocs(collection(db, 'services'))
 
-    const enrichedServices = await Promise.all(serviceSnapshot.docs.map(async (docSnap) => {
-      const serviceData = docSnap.data();
-      const userUid = serviceData.userId;
+    const enriched = await Promise.all(serviceSnapshot.docs.map(async docSnap => {
+      const data = docSnap.data()
+      const uid = data.userId
 
-      let firstName = "Име";
-      let lastName = "";
-      let image = new URL("@/assets/lok.png", import.meta.url).href;
-      let location = "Непознато";
+      let firstName = 'Име'
+      let lastName = ''
+      let image = new URL('@/assets/lok.png', import.meta.url).href
+      let location = 'Непознато'
 
-      if (userUid) {
-        const userQuery = query(collection(db, "users"), where("uid", "==", userUid));
-        const userSnapshot = await getDocs(userQuery);
-
-        if (!userSnapshot.empty) {
-          const userData = userSnapshot.docs[0].data();
-          firstName = userData.firstName || firstName;
-          lastName = userData.lastName || lastName;
-          image = userData.image || image;
-          location = userData.city || location;
+      if (uid) {
+        const q = query(collection(db, 'users'), where('uid', '==', uid))
+        const userSnap = await getDocs(q)
+        if (!userSnap.empty) {
+          const user = userSnap.docs[0].data()
+          firstName = user.firstName || firstName
+          lastName = user.lastName || lastName
+          image = user.image || image
+          location = user.city || location
         }
 
-        const profilePicRef = doc(db, "userProfilePictures", userUid);
-        const profilePicSnap = await getDoc(profilePicRef);
-
-        if (profilePicSnap.exists()) {
-          const picData = profilePicSnap.data();
-          if (picData.profilePicture) {
-            image = picData.profilePicture;
-          }
+        const picRef = doc(db, 'userProfilePictures', uid)
+        const picSnap = await getDoc(picRef)
+        if (picSnap.exists()) {
+          const picData = picSnap.data()
+          if (picData.profilePicture) image = picData.profilePicture
         }
       }
 
@@ -140,276 +92,174 @@ const loadServices = async () => {
         id: docSnap.id,
         name: firstName,
         lastName,
-        job: serviceData.service || "Услуга",
+        job: data.service || 'Услуга',
         image,
         location,
-        rating: 5,
-      };
-    }));
+        rating: 5
+      }
+    }))
 
-    services.value = enrichedServices;
+    services.value = enriched
   } catch (error) {
-    console.error("Failed to load services:", error);
+    console.error('Error loading:', error)
   } finally {
-    isLoading.value = false;
+    isLoading.value = false
   }
-};
-
-const getJobIcon = (job) => {
-  const icons = {
-    "Електричар": "⚡",
-    "Водоводџија": "🔧",
-    "Дрводелец": "🩵",
-    "Механичар": "🔩",
-  };
-  return icons[job] || "💼";
-};
-
-const toggleFavorite = (service) => {
-  const index = favorites.value.findIndex((fav) => fav.id === service.id);
-  if (index === -1) {
-    favorites.value.push(service);
-  } else {
-    favorites.value.splice(index, 1);
-  }
-};
-
-const goToDetails = (service) => {
-  router.push({ path: `/service/${service.id}` });
-};
-
-const isFavorite = (service) => favorites.value.some((fav) => fav.id === service.id);
-
-// Display all services for now
-const filteredServicesList = services;
+}
 
 onMounted(() => {
-  loadServices();
-});
+  loadServices()
+})
 </script>
+<template>
+  <v-app>
+    <!-- Search Area -->
+    <v-container class="search-section py-16">
+      <v-sheet
+        elevation="10"
+        class="search-box rounded-xl mx-auto"
+        color="#212529"
+        max-width="900"
+      >
+        <v-row justify="center">
+          <v-col cols="12" class="text-center mb-6">
+            <h1 class="text-h4 font-weight-bold text-yellow">Најди Мајстор</h1>
+            <p class="text-grey-lighten-1">Пронајди најдобрите професионалци во твојот град</p>
+          </v-col>
+
+          <v-col cols="12" md="5">
+            <v-autocomplete
+              v-model="searchService"
+              :items="allServices"
+              label="Пребарај услуга..."
+              density="comfortable"
+              color="warning"
+              variant="outlined"
+              clearable
+              hide-details
+            />
+          </v-col>
+
+          <v-col cols="12" md="5">
+            <v-select
+              v-model="searchCity"
+              :items="cities"
+              label="Внеси град..."
+              density="comfortable"
+              color="warning"
+              variant="outlined"
+              clearable
+              hide-details
+            />
+          </v-col>
+        </v-row>
+      </v-sheet>
+    </v-container>
+
+    <!-- Cards -->
+    <v-container>
+      <v-row justify="center" class="mt-10">
+        <v-col
+          v-for="service in filteredServicesList"
+          :key="service.id"
+          cols="12"
+          sm="6"
+          md="4"
+          lg="3"
+        >
+          <v-hover v-slot="{ props }">
+            <v-card
+              class="profile-card rounded-xl text-white"
+              color="#1f1f1f"
+              elevation="8"
+              v-bind="props"
+            >
+              <v-img
+                :src="service.image"
+                height="240px"
+                class="rounded-t-xl"
+                cover
+              ></v-img>
+
+              <v-card-text class="py-4 px-5">
+                <div class="text-h6 font-weight-bold text-yellow">
+                  {{ service.name }} {{ service.lastName }}
+                </div>
+
+                <div class="text-grey-lighten-1 text-subtitle-2 mt-2">
+                  {{ getJobIcon(service.job) }} {{ service.job }}
+                </div>
+                <div class="text-grey-lighten-1 text-subtitle-2">
+                  📍 {{ service.location }}
+                </div>
+                <div class="text-grey-lighten-1 text-subtitle-2 mb-2">
+                  ⭐ {{ service.rating }}/5
+                </div>
+
+                <v-btn
+                  block
+                  color="warning"
+                  variant="flat"
+                  class="text-black font-weight-bold mb-2"
+                  @click="goToDetails(service)"
+                >
+                  Контактирај ме
+                </v-btn>
+
+                <v-btn
+                  icon
+                  class="favorite-btn"
+                  @click="toggleFavorite(service)"
+                >
+                  <v-icon
+                    :color="isFavorite(service) ? 'yellow' : 'white'"
+                    size="24"
+                  >
+                    mdi-star
+                  </v-icon>
+                </v-btn>
+              </v-card-text>
+            </v-card>
+          </v-hover>
+        </v-col>
+      </v-row>
+    </v-container>
+  </v-app>
+</template>
+
 
 <style scoped>
-/* Shared Styles for both Sections */
-.services-container {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-  gap: 30px;
-  padding: 40px;
-  max-width: 1400px;
-  margin: auto;
-}
-
-.service-card {
-  background: rgba(255, 255, 255, 0.15);
-  backdrop-filter: blur(20px);
-  border-radius: 20px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
-  text-align: center;
-  padding: 20px;
-  border: 2px solid rgba(255, 255, 255, 0.2);
-  transition: transform 0.4s ease, box-shadow 0.4s ease;
-}
-
-.service-card:hover {
-  transform: translateY(-8px) scale(1.03);
-  box-shadow: 0 15px 40px rgba(255, 193, 7, 0.5);
-}
-
-.image-container {
-  width: 100%;
-  height: 200px;
-  overflow: hidden;
-  border-radius: 15px;
-}
-
-.profile-pic {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  transition: transform 0.4s ease-in-out;
-}
-
-.service-card:hover .profile-pic {
-  transform: scale(1.1);
-}
-
-h3 {
-  font-size: 22px;
-  font-weight: 700;
+.text-yellow {
   color: #ffc107;
-  margin-top: 15px;
 }
 
-.job-title, .location, .rating {
-  font-size: 16px;
-  color: #ddd;
-  margin-bottom: 10px;
+.search-section {
+  background: linear-gradient(135deg, #0d0d0d, #1a1a1a);
+  border-radius: 20px;
 }
 
-.job-badge {
-  background: rgba(255, 193, 7, 0.2);
-  padding: 5px 10px;
-  border-radius: 10px;
+.search-box {
+  padding: 50px 30px;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 8px 25px rgba(255, 193, 7, 0.15);
 }
 
-.btn-container {
-  display: flex;
-  justify-content: center;
-  gap: 10px;
-  margin-top: 10px;
+.profile-card {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(8px);
 }
 
-.contact-btn {
-  background: linear-gradient(135deg, #ffc107, #ff9800);
-  color: white;
-  font-size: 15px;
-  padding: 10px 20px;
-  border-radius: 25px;
-  border: none;
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-
-.contact-btn:hover {
-  background: linear-gradient(135deg, #ff9800, #ff6f00);
-  box-shadow: 0px 4px 15px rgba(255, 193, 7, 0.4);
+.profile-card:hover {
+  transform: translateY(-8px) scale(1.02);
+  box-shadow: 0 10px 30px rgba(255, 193, 7, 0.2);
 }
 
 .favorite-btn {
-  background: none;
-  border: none;
-  font-size: 24px;
-  cursor: pointer;
-}
-
-.favorite-btn span {
-  color: white;
-  transition: color 0.3s ease, transform 0.2s ease;
-}
-
-.favorite-btn span.favorite {
-  color: #ffc107;
-  transform: scale(1.2);
-}
-
-.favorite-btn:hover span {
-  color: #ffc107;
-  transform: scale(1.1);
-}
-
-/* Search Section Styles */
-.background {
-  position: relative;
-  width: 100%;
-  height: 50vh;
-  background: linear-gradient(135deg, #0d0d0d, #1a1a1a);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.overlay {
+  background-color: black;
   position: absolute;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.3);
-  backdrop-filter: blur(6px);
-}
-
-.container {
-  position: relative;
-  background-color: #212529;
-  border-radius: 15px;
-  padding: 40px;
-  max-width: 750px;
-  width: 90%;
-  text-align: center;
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-}
-
-.title h1 {
-  font-size: 32px;
-  font-weight: 700;
-  color: #ffcc00;
-}
-
-.subtitle {
-  font-size: 16px;
-  color: #ddd;
-  margin-top: 5px;
-}
-
-.inputs-container {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 15px;
-  justify-content: center;
-  margin-top: 20px;
-}
-
-.input-group {
-  position: relative;
-  width: 90%;
-  max-width: 350px;
-}
-
-.input-group input {
-  width: 90%;
-  padding: 14px;
-  font-size: 16px;
-  border-radius: 12px;
-  background: rgba(255, 255, 255, 0.1);
-  color: white;
-  border: 2px solid transparent;
-  transition: all 0.3s ease-in-out;
-}
-
-.input-group input:focus {
-  background: rgba(255, 255, 255, 0.2);
-  outline: none;
-  border-color: #ffcc00;
-  box-shadow: 0 0 12px rgba(255, 204, 0, 0.6);
-}
-
-.dropdown {
-  position: absolute;
-  top: 100%;
-  left: 0;
-  width: 90%;
-  background: rgba(0, 0, 0, 0.7);
-  backdrop-filter: blur(8px);
-  border-radius: 10px;
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  max-height: 180px;
-  overflow-y: auto;
-  z-index: 10;
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-}
-
-.dropdown li {
-  padding: 12px;
-  cursor: pointer;
-  color: white;
-  list-style: none;
-  transition: 0.2s;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.dropdown li:hover {
-  background: rgba(255, 204, 0, 0.3);
-}
-
-/* Animations */
-.fade-enter-active,
-.fade-leave-active {
-  transition: opacity 0.3s ease;
-}
-
-.fade-enter, .fade-leave-to {
-  opacity: 0;
+  top: 10px;
+  right: 10px;
 }
 </style>

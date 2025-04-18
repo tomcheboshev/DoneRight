@@ -1,122 +1,121 @@
-<script setup></script>
-
 <template>
-<section id="categories" class="categories">
-        <div class="section-header">
-            <h1>Нашите услуги</h1>
-            <p>Истражете ги различните услуги што ги нудат искусни професионалци. Пронајдете го вистинскиот експерт за вашите потреби!</p>
-        </div>
+  <section id="categories" class="categories">
+    <div class="section-header">
+      <h1>Нашите услуги</h1>
+      <p>
+        Истражете ги различните услуги што ги нудат искусни професионалци.
+        Пронајдете го вистинскиот експерт за вашите потреби!
+      </p>
+    </div>
 
-        <div class="cards-container">
-    <div class="card">
-      <font-awesome-icon :icon="['fas', 'plug']" class="card-icon"/>
-      <h3>Електричар</h3>
+    <div class="cards-container">
+      <div class="card" v-for="(item, index) in services" :key="index">
+        <font-awesome-icon :icon="item.icon" class="card-icon" />
+        <h3>{{ item.label }}</h3>
+      </div>
     </div>
-    <div class="card">
-      <font-awesome-icon :icon="['fas', 'wrench']" class="card-icon"/>
-      <h3>Водоводџија</h3>
-    </div>
-    <div class="card">
-      <font-awesome-icon :icon="['fas', 'paint-roller']" class="card-icon"/>
-      <h3>Молер</h3>
-    </div>
-    <div class="card">
-      <font-awesome-icon :icon="['fas', 'tools']" class="card-icon"/>
-      <h3>Механичар</h3>
-    </div>
-    <div class="card">
-      <font-awesome-icon :icon="['fas', 'hammer']" class="card-icon"/>
-      <h3>Дрводелец</h3>
-    </div>
-    <div class="card">
-      <font-awesome-icon :icon="['fas', 'bolt']" class="card-icon"/>
-      <h3>Техничар</h3>
-    </div>
-    <div class="card">
-      <font-awesome-icon :icon="['fas', 'cogs']" class="card-icon"/>
-      <h3>Инженер</h3>
-    </div>
-    <div class="card">
-      <font-awesome-icon :icon="['fas', 'door-open']" class="card-icon"/>
-      <h3>Монтер</h3>
-    </div>
-    <div class="card">
-      <font-awesome-icon :icon="['fas', 'water']" class="card-icon"/>
-      <h3>Чистач</h3>
-    </div>
-  </div>
-    </section>
+  </section>
 </template>
+
+
+<script setup>
+const services = [
+  { label: 'Електричар', icon: ['fas', 'plug'] },
+  { label: 'Водоводџија', icon: ['fas', 'wrench'] },
+  { label: 'Молер', icon: ['fas', 'paint-roller'] },
+  { label: 'Механичар', icon: ['fas', 'tools'] },
+  { label: 'Дрводелец', icon: ['fas', 'hammer'] },
+  { label: 'Техничар', icon: ['fas', 'bolt'] },
+  { label: 'Инженер', icon: ['fas', 'cogs'] },
+  { label: 'Монтер', icon: ['fas', 'door-open'] },
+  { label: 'Чистач', icon: ['fas', 'water'] }
+];
+
+</script>
 
 <style scoped>
 .categories {
   padding: 100px 20px;
-  margin-bottom: 100px;
   display: flex;
-  flex-direction: column;  /* Подредување на текстот и картичките вертикално */
-  align-items: center;     /* Центрирање на сите елементи хоризонтално */
-  gap: 30px;               /* Простор помеѓу текстот и картичките */
+  flex-direction: column;
+  align-items: center;
+  gap: 40px;
+  background: radial-gradient(ellipse at center, #1c1c1c 0%, #121212 100%);
 }
 
-.categories .section-header {
+.section-header {
   text-align: center;
+  max-width: 800px;
+  color: white;
 }
 
-.categories .section-header h1 {
+.section-header h1 {
   font-size: 3rem;
   color: #ffc107;
   margin-bottom: 20px;
+  text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.5);
 }
 
-.categories .section-header p {
-  font-size: 1.5rem;
-  color: white;
-  max-width: 800px;
-  margin: 0 auto; /* Центрирање на параграфот */
-  margin-bottom: 15px;
+.section-header p {
+  font-size: 1.25rem;
+  color: #ccc;
   line-height: 1.6;
 }
 
-.categories .cards-container {
-  display: flex;
-  justify-content: center; /* Центрирање на картичките хоризонтално */
-  align-items: center;     /* Центрирање на картичките вертикално */
-  flex-wrap: wrap;         /* Овозможување на редење на картичките ако екранот е мал */
-  gap: 30px;               /* Простор помеѓу картичките */
+.cards-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 30px;
+  width: 100%;
+  max-width: 1000px;
 }
 
-.categories .card {
-  background-color: #212529;
-  color: white;
-  height: 120px;  /* Малку повисоки картички за повеќе простор */
-  width: 120px;   /* Фиксна ширина за секоја картичка */
-  flex: 0 0 auto; /* Спречување на истегнување на картичките */
-  border-radius: 10px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3); /* Поголема сенка за повеќе длабочина */
+.card {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  padding: 25px 15px;
   text-align: center;
-  padding: 20px;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  color: white;
+  transition: transform 0.4s ease, box-shadow 0.3s ease;
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+  cursor: pointer;
 }
 
-.categories .card:hover {
-  transform: scale(1.1);  /* Зголемување на картичката при лебдење */
-  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.4);  /* Поголема сенка при лебдење */
+.card:hover {
+  transform: translateY(-8px) scale(1.05);
+  box-shadow: 0 12px 24px rgba(255, 193, 7, 0.2);
+}
+
+.card h3 {
+  font-size: 1rem;
+  margin-top: 10px;
+  color: #f1f1f1;
+  font-weight: 600;
 }
 
 .card-icon {
-  font-size: 45px;   /* Поголеми икони */
+  font-size: 38px;
   color: #ffc107;
-  margin-bottom: 10px;
+  transition: transform 0.4s ease;
 }
 
+.card:hover .card-icon {
+  transform: rotate(10deg) scale(1.2);
+}
+
+/* Responsive tweaks */
 @media (max-width: 768px) {
-  .categories {
-    padding: 60px 20px; /* Намалување на растојанието за помали екрани */
+  .section-header h1 {
+    font-size: 2.4rem;
   }
-
-  .categories .card {
-    width: 100px; /* Прилагодување на ширината за мобилни уреди */
-    height: 100px; /* Прилагодување на висината за мобилни уреди */
+  .section-header p {
+    font-size: 1rem;
+  }
+  .card h3 {
+    font-size: 0.95rem;
   }
 }
+
 </style>

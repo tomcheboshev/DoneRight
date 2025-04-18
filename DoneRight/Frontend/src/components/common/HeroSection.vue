@@ -9,17 +9,6 @@
       <p class="subtitle">Поврзуваме професионалци со муштерии со само неколку клика.</p>
       <button class="explore-btn">Побарај</button>
     </div>
-    <div class="wave">
-      <svg viewBox="0 0 1440 320">
-        <path fill="url(#waveGradient)" fill-opacity="1" d="M0,96L60,117.3C120,139,240,181,360,186.7C480,192,600,160,720,133.3C840,107,960,85,1080,106.7C1200,128,1320,192,1380,224L1440,256L1440,320L1380,320C1320,320,1200,320,1080,320C960,320,840,320,720,320C600,320,480,320,360,320C240,320,120,320,60,320L0,320Z"></path>
-        <defs>
-          <linearGradient id="waveGradient" x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0%" stop-color="#ffc107"/>
-            <stop offset="100%" stop-color="#ad8409"/>
-          </linearGradient>
-        </defs>
-      </svg>
-    </div>
   </section>
 </template>
 

@@ -1,69 +1,92 @@
+<template>
+  <v-app>
+    <div class="background">
+      <div class="overlay"></div>
+      <v-container class="form-container" fluid>
+        <v-card class="form-card" elevation="10">
+          <v-card-title class="text-center text-yellow-darken-2 text-h5 font-weight-bold">
+            Најава
+          </v-card-title>
+
+          <v-form @submit.prevent="handleLogin" class="px-4">
+            <v-text-field
+              v-model="form.email"
+              label="Емајл адреса"
+              type="email"
+              variant="outlined"
+              density="comfortable"
+              color="warning"
+              hide-details
+              class="mb-4"
+              required
+            />
+
+            <v-text-field
+              v-model="form.password"
+              label="Лозинка"
+              type="password"
+              variant="outlined"
+              density="comfortable"
+              color="warning"
+              hide-details
+              class="mb-4"
+              required
+            />
+
+            <div class="account-link text-white text-caption mb-5">
+              Немате профил?
+              <span class="link" @click="redirectToRegister">Регистрирај се</span>
+            </div>
+
+            <v-btn
+              type="submit"
+              color="warning"
+              block
+              size="large"
+              class="text-white font-weight-bold"
+            >
+              Најави се
+            </v-btn>
+          </v-form>
+        </v-card>
+      </v-container>
+    </div>
+  </v-app>
+</template>
+
 <script setup>
-import { ref } from "vue";
-import { useRouter } from "vue-router";
-import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
+import { ref } from 'vue'
+import { useRouter } from 'vue-router'
+import { getAuth, signInWithEmailAndPassword } from 'firebase/auth'
 
-const router = useRouter();
-
+const router = useRouter()
 const form = ref({
-  email: "",
-  password: "",
-});
+  email: '',
+  password: ''
+})
 
 const handleLogin = async () => {
-  const auth = getAuth();
+  const auth = getAuth()
   try {
     const userCredential = await signInWithEmailAndPassword(
       auth,
       form.value.email,
       form.value.password
-    );
-
-    const user = userCredential.user;
-    alert("Најавата беше успешна!");
-    // Optionally store token or user info
-    // localStorage.setItem("token", await user.getIdToken());
-    router.push("/"); // or wherever you want to redirect
+    )
+    alert('Најавата беше успешна!')
+    router.push('/')
   } catch (error) {
-    console.error("Login error:", error);
-    alert("Грешка при најава: " + error.message);
+    console.error('Login error:', error)
+    alert('Грешка при најава: ' + error.message)
   }
-};
+}
 
 const redirectToRegister = () => {
-  router.push("/apply");
-};
+  router.push('/apply')
+}
 </script>
 
-<template>
-  <div class="background">
-    <div class="overlay"></div>
-    <div class="login-container">
-      <h1 class="title">Најава</h1>
-
-      <form @submit.prevent="handleLogin" class="login-form">
-        <div class="input-group">
-          <input type="email" id="email" v-model="form.email" required />
-          <label for="email">Емајл адреса</label>
-        </div>
-
-        <div class="input-group">
-          <input type="password" id="password" v-model="form.password" required />
-          <label for="password">Лозинка</label>
-        </div>
-
-        <p class="account-link">
-          Немате профил? <span @click="redirectToRegister" class="link">Регистрирај се</span>
-        </p>
-
-        <button type="submit" class="submit-btn">Најави се</button>
-      </form>
-    </div>
-  </div>
-</template>
-
 <style scoped>
-/* Background Animation */
 .background {
   position: relative;
   width: 100%;
@@ -74,86 +97,32 @@ const redirectToRegister = () => {
   align-items: center;
   overflow: hidden;
 }
-
-/* Overlay for a sleek effect */
 .overlay {
   position: absolute;
   width: 100%;
   height: 100%;
-  background: rgba(0, 0, 0, 0.3);
   backdrop-filter: blur(10px);
+  background: rgba(0, 0, 0, 0.3);
+  z-index: 0;
 }
-
-/* Form Container */
-.login-container {
-  position: relative;
-  background-color: rgba(255, 255, 255, 0.1);
-  border-radius: 12px;
-  padding: 30px;
-  max-width: 400px;
-  width: 100%;
-  box-shadow: 0 5px 25px rgba(0, 0, 0, 0.3);
-  text-align: center;
+.form-container {
+  z-index: 1;
+  display: flex;
+  justify-content: center;
+}
+.form-card {
+  background-color: rgba(255, 255, 255, 0.05);
   backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-}
-
-/* Title */
-.title {
-  font-size: 24px;
-  font-weight: 700;
-  color: #ffc107;
-}
-
-/* Input Fields */
-.input-group {
-  position: relative;
-  width: 92%;
-  margin-bottom: 15px;
-}
-
-.input-group input {
+  border-radius: 16px;
+  padding: 30px 20px;
+  max-width: 420px;
   width: 100%;
-  padding: 14px;
-  border: 2px solid rgba(255, 255, 255, 0.3);
-  border-radius: 6px;
-  font-size: 14px;
-  background: rgba(255, 255, 255, 0.2);
-  color: white;
-  transition: 0.3s;
-  margin-top: 6px;
-}
-
-.input-group input:focus {
-  background: rgba(255, 255, 255, 0.3);
-  outline: none;
-  border-color: #ffc107;
-}
-
-/* Floating Label */
-.input-group label {
-  position: absolute;
-  top: 54%;
-  left: 12px;
-  transform: translateY(-50%);
-  font-size: 14px;
-  color: #ddd;
-  transition: 0.3s;
-  pointer-events: none;
-}
-
-.input-group input:focus + label,
-.input-group input:valid + label {
-  top: -2px;
-  left: 5px;
-  font-size: 12px;
   color: white;
 }
 
-/* Account Link */
+/* Link styling */
 .account-link {
-  font-size: 14px;
-  margin-top: 20px;
+  text-align: center;
   color: #ddd;
 }
 
@@ -162,49 +131,7 @@ const redirectToRegister = () => {
   cursor: pointer;
   font-weight: 600;
 }
-
 .account-link .link:hover {
   text-decoration: underline;
-}
-
-/* Submit Button */
-.submit-btn {
-  width: 100%;
-  padding: 14px;
-  background: linear-gradient(90deg, #ff9d00, #ffcd38);
-  color: white;
-  font-size: 16px;
-  font-weight: 600;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: 0.3s;
-  margin-top: 15px;
-}
-
-.submit-btn:hover {
-  background: linear-gradient(90deg, #ffb400, #ffdf70);
-}
-
-/* Responsiveness */
-@media (max-width: 480px) {
-  .login-container {
-    padding: 20px;
-    max-width: 75%;
-  }
-
-  .title {
-    font-size: 22px;
-  }
-
-  .input-group input {
-    font-size: 16px;
-    padding: 12px;
-  }
-
-  .submit-btn {
-    font-size: 14px;
-    padding: 12px;
-  }
 }
 </style>

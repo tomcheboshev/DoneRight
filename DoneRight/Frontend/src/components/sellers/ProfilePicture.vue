@@ -1,201 +1,171 @@
 <template>
-  <div class="background">
-    <div class="overlay"></div>
-    <div class="profile-container">
-      <h1 class="title">Поставете Профилна Слика</h1>
-      <p class="subtitle">Изберете или влечете слика за прикачување.</p>
+  <v-app>
+    <div class="background">
+      <div class="overlay"></div>
+      <v-container class="form-container" fluid>
+        <v-card class="profile-card" elevation="10">
+          <v-card-title class="text-center text-yellow-darken-2 text-h5 font-weight-bold">
+            Поставете Профилна Слика
+          </v-card-title>
+          <v-card-subtitle class="text-center mb-4 text-white">
+            Изберете или прилагодете слика за вашиот профил
+          </v-card-subtitle>
 
-      <!-- Custom File Upload Box -->
-      <label class="upload-box" @dragover.prevent @drop="handleDrop">
-        <input type="file" accept="image/*" @change="handleFileChange" />
-        <div class="upload-content">
-          <span class="upload-icon">📷</span>
-          <p class="upload-text">Кликнете или влечете слика тука</p>
-        </div>
-      </label>
+          <!-- Upload Zone -->
+          <label
+            class="upload-box"
+            @dragover.prevent
+            @drop="handleDrop"
+          >
+            <input type="file" accept="image/*" @change="handleFileChange" />
+            <div class="upload-content">
+              <span class="upload-icon">📷</span>
+              <p class="upload-text">Кликнете или влечете слика тука</p>
+            </div>
+          </label>
 
-      <!-- Image Preview & Cropper -->
-      <div v-if="selectedFile" class="cropper-container">
-        <img ref="imageRef" :src="selectedFile" class="cropper-image" />
-      </div>
+          <!-- Cropper -->
+          <div v-if="selectedFile" class="cropper-wrapper mt-4">
+            <img ref="imageRef" :src="selectedFile" class="cropper-image" />
+          </div>
 
-      <button v-if="selectedFile" @click="submitProfilePicture" class="submit-btn">
-        Заврши
-      </button>
+          <!-- Submit Button -->
+          <v-btn
+            v-if="selectedFile"
+            color="warning"
+            block
+            class="mt-4 text-white font-weight-bold"
+            @click="submitProfilePicture"
+          >
+            Заврши
+          </v-btn>
+        </v-card>
+      </v-container>
     </div>
-  </div>
+  </v-app>
 </template>
 
 <script setup>
-import { ref, nextTick } from "vue";
-import Cropper from "cropperjs";
-import "cropperjs/dist/cropper.css";
-import { useRouter } from "vue-router";
-import { getStorage, ref as storageRef, uploadString, getDownloadURL } from "firebase/storage";
-import { getAuth } from "firebase/auth";
-import { db } from "@/firebase";
-import { doc, setDoc } from "firebase/firestore";
+import { ref, nextTick } from 'vue'
+import { useRouter } from 'vue-router'
+import Cropper from 'cropperjs'
+import 'cropperjs/dist/cropper.css'
 
-const router = useRouter();
-const auth = getAuth();
-const storage = getStorage();
+import { getAuth } from 'firebase/auth'
+import { getStorage, ref as storageRef, uploadString, getDownloadURL } from 'firebase/storage'
+import { doc, setDoc } from 'firebase/firestore'
+import { db } from '@/firebase'
 
-const imageRef = ref(null);
-const cropper = ref(null);
-const selectedFile = ref(null);
+const auth = getAuth()
+const storage = getStorage()
+const router = useRouter()
 
-// Handle file selection via input change
-const handleFileChange = (event) => {
-  const file = event.target.files[0];
-  processFile(file);
-};
+const selectedFile = ref(null)
+const imageRef = ref(null)
+const cropper = ref(null)
 
-// Handle drag-and-drop events
-const handleDrop = (event) => {
-  event.preventDefault();
-  const file = event.dataTransfer.files[0];
-  processFile(file);
-};
+// Handle file select/drop
+const handleFileChange = (e) => processFile(e.target.files[0])
+const handleDrop = (e) => processFile(e.dataTransfer.files[0])
 
-// Process the file and initialize Cropper
 const processFile = (file) => {
-  if (file) {
-    console.log("✅ Selected file:", file);
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      selectedFile.value = e.target.result;
-      console.log("✅ FileReader result (data URL):", selectedFile.value.slice(0, 100));
-      nextTick(() => {
-        console.log("🔄 Waiting for imageRef to be set...");
-        if (imageRef.value) {
-          console.log("✅ imageRef is set:", imageRef.value);
-          cropper.value = new Cropper(imageRef.value, {
-            aspectRatio: 1,
-            viewMode: 2,
-            autoCropArea: 1,
-            zoomable: true,
-            scalable: true,
-            movable: true,
-            cropBoxResizable: true,
-            ready() {
-              console.log("✅ Cropper initialized successfully.");
-            }
-          });
-        } else {
-          console.error("❌ imageRef is not set. Cannot initialize Cropper.");
-        }
-      });
-    };
-    reader.onerror = (err) => {
-      console.error("❌ FileReader error:", err);
-    };
-    reader.readAsDataURL(file);
-  } else {
-    console.error("❌ No file selected.");
+  if (!file) return
+  const reader = new FileReader()
+  reader.onload = (e) => {
+    selectedFile.value = e.target.result
+    nextTick(() => {
+      if (imageRef.value) {
+        cropper.value = new Cropper(imageRef.value, {
+          aspectRatio: 1,
+          viewMode: 1,
+          autoCropArea: 1,
+          responsive: true,
+          zoomable: true,
+          movable: true,
+          scalable: true
+        })
+      }
+    })
   }
-};
+  reader.readAsDataURL(file)
+}
 
-// Submit the cropped image to Firebase Storage and update the new collection "userProfilePictures"
+// Upload cropped image
 const submitProfilePicture = async () => {
-  console.log("🚀 Submitting cropped image...");
-  if (!cropper.value) {
-    alert("Мора да изберете и прилагодите профилна слика.");
-    console.error("❌ Cropper not initialized.");
-    return;
+  if (!cropper.value) return
+  const canvas = cropper.value.getCroppedCanvas()
+  const croppedImage = canvas.toDataURL('image/png')
+
+  const user = auth.currentUser
+  if (!user) {
+    alert('Не сте најавени')
+    return
   }
 
-  const croppedCanvas = cropper.value.getCroppedCanvas();
-  if (!croppedCanvas) {
-    console.error("❌ Cropper did not return a canvas.");
-    return;
-  }
+  const storagePath = storageRef(storage, `profile_pictures/${user.uid}`)
+  const upload = await uploadString(storagePath, croppedImage, 'data_url')
+  const url = await getDownloadURL(upload.ref)
 
-  const croppedImage = croppedCanvas.toDataURL("image/png");
-  console.log("✅ Cropped image data URL (first 100 chars):", croppedImage.slice(0, 100));
+  await setDoc(doc(db, 'userProfilePictures', user.uid), {
+    profilePicture: url
+  })
 
-  try {
-    const user = auth.currentUser;
-    if (!user) {
-      alert("User not logged in!");
-      console.error("❌ No authenticated user found.");
-      return;
-    }
-
-    // Create a reference in Firebase Storage for the user's profile picture
-    const storageReference = storageRef(storage, `profile_pictures/${user.uid}`);
-    console.log("✅ Firebase storage reference created:", storageReference);
-
-    // Upload the image to Firebase Storage
-    const uploadTask = await uploadString(storageReference, croppedImage, "data_url");
-    console.log("✅ Image uploaded to Firebase Storage:", uploadTask);
-
-    // Retrieve download URL
-    const downloadURL = await getDownloadURL(uploadTask.ref);
-    console.log("✅ Download URL from Firebase:", downloadURL);
-
-    // Update (or create) the document in the "userProfilePictures" collection
-    const profilePicDocRef = doc(db, "userProfilePictures", user.uid);
-    console.log("📄 Updating Firestore document at:", profilePicDocRef);
-
-    await setDoc(profilePicDocRef, { profilePicture: downloadURL });
-    console.log("✅ Firestore document created/updated successfully with profilePicture.");
-
-    router.push("/success");
-  } catch (error) {
-    console.error("❌ Error during submission process:", error);
-  }
-};
+  alert('Сликата е успешно поставена!')
+  router.push('/success')
+}
 </script>
 
 <style scoped>
-/* Background */
 .background {
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  background-color: #212529;
   height: 100vh;
-  background: #212529;
-  padding: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
 }
 
-/* Overlay */
 .overlay {
   position: absolute;
   width: 100%;
   height: 100%;
   backdrop-filter: blur(8px);
+  background: rgba(0, 0, 0, 0.3);
+  z-index: 0;
 }
 
-/* Profile Container */
-.profile-container {
-  position: relative;
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 12px;
-  padding: 25px;
+.form-container {
+  z-index: 1;
+  display: flex;
+  justify-content: center;
+}
+
+.profile-card {
+  background-color: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(16px);
+  border-radius: 16px;
+  padding: 24px 16px;
   max-width: 420px;
   width: 100%;
+  color: white;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.v-card-title,
+.v-card-subtitle {
+  white-space: normal !important;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
   text-align: center;
-  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  width: 100%;
+  line-height: 1.4;
+  margin: 0 auto;
 }
 
-/* Title */
-.title {
-  font-size: 22px;
-  font-weight: 700;
-  color: #ffc107;
-  margin-bottom: 10px;
-}
 
-/* Subtitle */
-.subtitle {
-  font-size: 14px;
-  color: #ddd;
-  margin-bottom: 20px;
-}
-
-/* Upload Box */
+/* Upload styling */
 .upload-box {
   width: 100%;
   height: 140px;
@@ -204,18 +174,15 @@ const submitProfilePicture = async () => {
   display: flex;
   align-items: center;
   justify-content: center;
-  cursor: pointer;
   position: relative;
-  transition: all 0.3s ease-in-out;
-  background: rgba(255, 255, 255, 0.05);
+  background: rgba(255, 255, 255, 0.07);
+  cursor: pointer;
+  transition: 0.3s;
 }
-
 .upload-box:hover {
   border-color: #ffc107;
   background: rgba(255, 255, 255, 0.1);
 }
-
-/* Hide default input */
 .upload-box input {
   position: absolute;
   width: 100%;
@@ -223,107 +190,75 @@ const submitProfilePicture = async () => {
   opacity: 0;
   cursor: pointer;
 }
-
-/* Upload Content */
 .upload-content {
   text-align: center;
 }
-
 .upload-icon {
   font-size: 30px;
   color: #ffc107;
 }
-
 .upload-text {
   font-size: 14px;
   color: #ddd;
   margin-top: 5px;
 }
 
-/* Cropper Container */
-.cropper-container {
+/* Cropper */
+.cropper-wrapper {
   width: 100%;
-  max-height: 300px;
   overflow: hidden;
-  margin: 15px 0;
 }
-
 .cropper-image {
   width: 100%;
-  max-height: 300px;
   border-radius: 8px;
+  max-height: 300px;
+  object-fit: cover;
 }
 
-/* Submit Button */
-.submit-btn {
-  width: 100%;
-  padding: 14px;
-  background: linear-gradient(90deg, #ff9d00, #ffcd38);
-  color: white;
-  font-size: 16px;
-  font-weight: 600;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: 0.3s;
-  margin-top: 15px;
-}
-
-.submit-btn:hover {
-  background: linear-gradient(90deg, #ffb400, #ffdf70);
-  transform: scale(1.05);
-}
-
-/* Responsive Design */
+/* RESPONSIVE TEXT + CARD */
 @media (max-width: 768px) {
-  .profile-container {
-    max-width: 90%;
+  .profile-card {
     padding: 20px;
   }
-  .title {
-    font-size: 20px;
+
+  .v-card-title {
+    font-size: 23px !important;
   }
-  .subtitle {
+
+  .v-card-subtitle {
+    font-size: 18px !important;
+  }
+
+  .upload-text {
     font-size: 13px;
   }
-  .upload-box {
-    height: 120px;
-  }
+
   .upload-icon {
     font-size: 26px;
-  }
-  .upload-text {
-    font-size: 12px;
-  }
-  .submit-btn {
-    padding: 12px;
-    font-size: 15px;
   }
 }
 
 @media (max-width: 480px) {
-  .profile-container {
+  .profile-card {
     max-width: 95%;
-    padding: 15px;
+    padding: 16px;
   }
-  .title {
-    font-size: 18px;
+
+  .v-card-title {
+    font-size: 20px !important;
   }
-  .subtitle {
+
+  .v-card-subtitle {
+    font-size: 15px !important;
+  }
+
+  .upload-text {
     font-size: 12px;
   }
-  .upload-box {
-    height: 110px;
-  }
+
   .upload-icon {
     font-size: 24px;
   }
-  .upload-text {
-    font-size: 11px;
-  }
-  .submit-btn {
-    padding: 10px;
-    font-size: 14px;
-  }
 }
+
 </style>

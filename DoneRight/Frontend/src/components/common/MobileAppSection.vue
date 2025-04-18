@@ -25,11 +25,11 @@ import QrCodeImage from '@/assets/QR.png'
   background-color: #212529;
   color: white;
   padding: 70px 15px;
+  border-radius: 15px;
   display: flex;
   justify-content: center;
   align-items: center;
-  margin: 50px 15px;
-  border-radius: 40px;
+  margin: 15px 15px;
   position: relative;
   overflow: hidden;
   flex-wrap: wrap;
