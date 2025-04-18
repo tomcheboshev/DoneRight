@@ -63,7 +63,7 @@
         <v-container>
           <transition name="fade-slide">
             <v-card class="welcome-card" elevation="2">
-              <v-card-title class="text-white">🔥 Welcome back, Rockstar!</v-card-title>
+              <v-card-title class="text-white">🔥 Welcome back, {{ userName }}!</v-card-title>
               <v-card-subtitle class="text-white">Let's build something awesome today.</v-card-subtitle>
             </v-card>
           </transition>
@@ -90,10 +90,17 @@
     </div>
   </v-app>
 </template>
+
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
+import { getAuth, onAuthStateChanged } from 'firebase/auth'
+import { collection, query, where, getDocs } from 'firebase/firestore'
+import { db } from '@/firebase'
 import logo from '@/assets/logo.png'
+
 const drawer = ref(true)
+const isRail = ref(false)
+const userName = ref('Rockstar') // default fallback
 
 const navItems = [
   { title: 'Dashboard', icon: 'mdi-view-dashboard', route: '/' },
@@ -107,7 +114,25 @@ const stats = [
   { title: 'Revenue', subtitle: '$42,300 this month', icon: 'mdi-currency-usd' },
   { title: 'Tasks Completed', subtitle: '86% done', icon: 'mdi-check-circle-outline' }
 ]
+
+// Fetch user name from Firestore on mount
+onMounted(async () => {
+  const auth = getAuth()
+  onAuthStateChanged(auth, async (user) => {
+    if (user) {
+      const q = query(collection(db, 'users'), where('uid', '==', user.uid))
+      const snapshot = await getDocs(q)
+      if (!snapshot.empty) {
+        const data = snapshot.docs[0].data()
+        userName.value = `${data.firstName} ${data.lastName}`
+      } else {
+        userName.value = user.displayName || 'Корисник'
+      }
+    }
+  })
+})
 </script>
+
 <style scoped>
 /* Layout wrapper syncs everything with sidebar */
 .layout-wrapper {

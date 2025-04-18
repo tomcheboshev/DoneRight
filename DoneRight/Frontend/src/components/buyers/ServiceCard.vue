@@ -1,5 +1,8 @@
 <template>
   <div>
+    <!-- Preloader -->
+    <PreloaderSection v-if="isLoading" />
+
     <!-- Search Section -->
     <div class="background">
       <div class="overlay"></div>
@@ -85,6 +88,7 @@
 </template>
 
 <script setup>
+import PreloaderSection from '@/components/common/PreloaderSection.vue';
 import { ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import { collection, getDocs, query, where, doc, getDoc } from "firebase/firestore";
@@ -92,9 +96,11 @@ import { db } from "@/firebase";
 
 const services = ref([]);
 const favorites = ref([]);
+const isLoading = ref(true);
 const router = useRouter();
 
 const loadServices = async () => {
+  isLoading.value = true;
   try {
     const serviceSnapshot = await getDocs(collection(db, "services"));
 
@@ -108,7 +114,6 @@ const loadServices = async () => {
       let location = "Непознато";
 
       if (userUid) {
-        // 🔍 Query users collection by "uid" field
         const userQuery = query(collection(db, "users"), where("uid", "==", userUid));
         const userSnapshot = await getDocs(userQuery);
 
@@ -138,13 +143,15 @@ const loadServices = async () => {
         job: serviceData.service || "Услуга",
         image,
         location,
-        rating: 5, // Hardcoded until ratings are implemented
+        rating: 5,
       };
     }));
 
     services.value = enrichedServices;
   } catch (error) {
     console.error("Failed to load services:", error);
+  } finally {
+    isLoading.value = false;
   }
 };
 
@@ -152,7 +159,7 @@ const getJobIcon = (job) => {
   const icons = {
     "Електричар": "⚡",
     "Водоводџија": "🔧",
-    "Дрводелец": "🪵",
+    "Дрводелец": "🩵",
     "Механичар": "🔩",
   };
   return icons[job] || "💼";
@@ -180,9 +187,6 @@ onMounted(() => {
   loadServices();
 });
 </script>
-
-
-
 
 <style scoped>
 /* Shared Styles for both Sections */
