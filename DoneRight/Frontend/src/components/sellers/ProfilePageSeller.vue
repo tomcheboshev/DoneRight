@@ -12,89 +12,19 @@
           </v-card-subtitle>
 
           <v-form @submit.prevent="submitApplication" class="px-4">
-            <v-text-field
-              v-model="form.firstName"
-              label="Име"
-              variant="outlined"
-              density="comfortable"
-              color="warning"
-              class="mb-4"
-              hide-details
-              required
-            />
-
-            <v-text-field
-              v-model="form.lastName"
-              label="Презиме"
-              variant="outlined"
-              density="comfortable"
-              color="warning"
-              class="mb-4"
-              hide-details
-              required
-            />
-
-            <v-text-field
-              v-model="form.email"
-              label="Емајл адреса"
-              type="email"
-              variant="outlined"
-              density="comfortable"
-              color="warning"
-              class="mb-4"
-              hide-details
-              required
-            />
-
-            <v-text-field
-              v-model="form.phone"
-              label="Телефонски број"
-              type="text"
-              variant="outlined"
-              density="comfortable"
-              color="warning"
-              class="mb-4"
-              hide-details
-              required
-            />
-
-            <!-- DROPDOWN -->
-            <v-select
-              v-model="form.city"
-              :items="cities"
-              label="Град"
-              variant="outlined"
-              density="comfortable"
-              color="warning"
-              class="mb-4"
-              hide-details
-              required
-            />
-
-            <v-text-field
-              v-model="form.password"
-              label="Лозинка"
-              type="password"
-              variant="outlined"
-              density="comfortable"
-              color="warning"
-              class="mb-5"
-              hide-details
-              required
-            />
+            <v-text-field v-model="form.firstName" label="Име" variant="outlined" density="comfortable" color="warning" class="mb-4" hide-details required />
+            <v-text-field v-model="form.lastName" label="Презиме" variant="outlined" density="comfortable" color="warning" class="mb-4" hide-details required />
+            <v-text-field v-model="form.email" label="Емајл адреса" type="email" variant="outlined" density="comfortable" color="warning" class="mb-4" hide-details required />
+            <v-text-field v-model="form.phone" label="Телефонски број" type="text" variant="outlined" density="comfortable" color="warning" class="mb-4" hide-details required />
+            <v-select v-model="form.city" :items="cities" label="Град" variant="outlined" density="comfortable" color="warning" class="mb-4" hide-details required />
+            <v-text-field v-model="form.password" label="Лозинка" type="password" variant="outlined" density="comfortable" color="warning" class="mb-5" hide-details required />
 
             <div class="account-link text-white text-caption mb-5">
               Имате веќе сметка?
               <span class="link" @click="redirectToLogin">Логирајте се тука</span>
             </div>
 
-            <v-btn
-              type="submit"
-              color="warning"
-              block
-              size="large"
-              class="text-white font-weight-bold"
-            >
+            <v-btn type="submit" color="warning" block size="large" class="text-white font-weight-bold">
               Продолжи
             </v-btn>
           </v-form>
@@ -107,6 +37,9 @@
 <script setup>
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
+import { getAuth, createUserWithEmailAndPassword, updateProfile } from 'firebase/auth'
+import { doc, setDoc } from 'firebase/firestore'
+import { db } from '@/firebase'
 
 const form = ref({
   firstName: '',
@@ -127,8 +60,36 @@ const cities = [
 
 const router = useRouter()
 
-const submitApplication = () => {
-  router.push('/next-form')
+const submitApplication = async () => {
+  const auth = getAuth()
+  try {
+    const userCredential = await createUserWithEmailAndPassword(
+      auth,
+      form.value.email,
+      form.value.password
+    )
+
+    const user = userCredential.user
+
+    await updateProfile(user, {
+      displayName: `${form.value.firstName} ${form.value.lastName}`,
+    })
+
+    await setDoc(doc(db, 'users', user.uid), {
+      uid: user.uid,
+      email: form.value.email,
+      firstName: form.value.firstName,
+      lastName: form.value.lastName,
+      phone: form.value.phone,
+      city: form.value.city,
+      isSeller: false,
+    })
+
+    router.push('/profile-picture')
+  } catch (error) {
+    console.error("Registration failed:", error)
+    alert("Регистрацијата не беше успешна: " + error.message)
+  }
 }
 
 const redirectToLogin = () => {
@@ -168,8 +129,7 @@ const redirectToLogin = () => {
   color: white;
 }
 
-/* Link styling */
-.account-link{
+.account-link {
   text-align: center;
 }
 .account-link .link {

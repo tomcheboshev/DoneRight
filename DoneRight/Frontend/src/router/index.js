@@ -13,6 +13,7 @@ import SuccessPage from '@/components/sellers/SuccessPage.vue';
 import ProfilePicturePage from '@/components/sellers/ProfilePicture.vue';
 import UserProfile from '@/components/Auth/UserProfile.vue'
 import Settings from '@/components/common/Settings.vue';
+import HowItWorks from '@/components/HowItWorks/howItWorks.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -29,8 +30,9 @@ const router = createRouter({
     { path: '/service/:id', component: ServiceDetails },
     { path: '/success', component: SuccessPage },
     { path: '/profile-picture', component: ProfilePicturePage },
-    { path: '/user-profile', component: UserProfile},
-    { path: '/settings', component: Settings}
+    { path: '/user-profile', component: UserProfile },
+    { path: '/settings', component: Settings },
+    { path: '/how-it-works', component: HowItWorks}
   ],
 });
 

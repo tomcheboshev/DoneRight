@@ -1,17 +1,39 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { getAuth, onAuthStateChanged } from 'firebase/auth'
+import { db } from '@/firebase'
+import { doc, getDoc } from 'firebase/firestore'
 
 const drawer = ref(false)
-const isLoggedIn = ref(true)
+const isLoggedIn = ref(false)
+const isSeller = ref(false)
 
 onMounted(() => {
   const auth = getAuth()
-  onAuthStateChanged(auth, (user) => {
-    isLoggedIn.value = !!user
+
+  onAuthStateChanged(auth, async (user) => {
+    if (user) {
+      isLoggedIn.value = true
+
+      try {
+        const docRef = doc(db, 'users', user.uid)
+        const userSnap = await getDoc(docRef)
+
+        if (userSnap.exists()) {
+          const userData = userSnap.data()
+          isSeller.value = userData.isSeller === true
+        }
+      } catch (err) {
+        console.error('Error fetching user data:', err)
+      }
+    } else {
+      isLoggedIn.value = false
+      isSeller.value = false
+    }
   })
 })
 </script>
+
 
 <template>
   <v-app-bar app flat height="96" class="custom-app-bar">
@@ -36,10 +58,36 @@ onMounted(() => {
     <div class="d-none d-md-flex align-center gap-6">
       <v-btn to="/" variant="text" class="nav-btn">Почетна</v-btn>
       <v-btn to="/services" variant="text" class="nav-btn">Услуги</v-btn>
-      <v-btn v-if="isLoggedIn" to="/favourite" variant="text" class="nav-btn">Омилени</v-btn>
-      <v-btn v-if="!isLoggedIn" to="/apply" variant="text" class="nav-btn">Стани мајстор</v-btn>
-      <v-btn v-else to="/seller-dashboard" variant="text" class="nav-btn">Табла</v-btn>
 
+      <!-- CONDITIONAL NAVIGATION -->
+      <v-btn
+        v-if="isLoggedIn"
+        to="/favourite"
+        variant="text"
+        class="nav-btn"
+      >
+        Омилени
+      </v-btn>
+
+      <v-btn
+        v-if="isLoggedIn && isSeller"
+        to="/seller-dashboard"
+        variant="text"
+        class="nav-btn"
+      >
+        Табла
+      </v-btn>
+
+      <v-btn
+        v-else-if="!isLoggedIn || !isSeller"
+        to="/how-it-works"
+        variant="text"
+        class="nav-btn"
+      >
+        Стани мајстор
+      </v-btn>
+
+      <!-- Auth Buttons -->
       <v-btn
         v-if="!isLoggedIn"
         to="/login"
@@ -52,7 +100,12 @@ onMounted(() => {
         <span class="font-weight-bold">Најави се</span>
       </v-btn>
 
-      <v-btn v-else to="/user-profile" icon class="text-yellow-darken-2">
+      <v-btn
+        v-else
+        to="/user-profile"
+        icon
+        class="text-yellow-darken-2"
+      >
         <v-icon size="32">mdi-account</v-icon>
       </v-btn>
     </div>
@@ -79,24 +132,31 @@ onMounted(() => {
       <v-list-item to="/services" @click="drawer = false">
         <v-list-item-title>Услуги</v-list-item-title>
       </v-list-item>
-      <v-list-item v-if="isLoggedIn" to="/favourite" @click="drawer = false">
+
+      <!-- CONDITIONAL NAVIGATION -->
+      <v-list-item v-if="isLoggedIn && isSeller" to="/favourite" @click="drawer = false">
         <v-list-item-title>Омилени</v-list-item-title>
       </v-list-item>
-      <v-list-item v-if="!isLoggedIn" to="/apply" @click="drawer = false">
-        <v-list-item-title>Стани мајстор</v-list-item-title>
-      </v-list-item>
-      <v-list-item v-else to="/seller-dashboard" @click="drawer = false">
+
+      <v-list-item v-if="isLoggedIn && isSeller" to="/seller-dashboard" @click="drawer = false">
         <v-list-item-title>Табла</v-list-item-title>
       </v-list-item>
+
+      <v-list-item v-else-if="isLoggedIn && !isSeller" to="/how-it-works" @click="drawer = false">
+        <v-list-item-title>Стани мајстор</v-list-item-title>
+      </v-list-item>
+
       <v-list-item v-if="!isLoggedIn" to="/login" @click="drawer = false">
         <v-list-item-title>Најави се</v-list-item-title>
       </v-list-item>
+
       <v-list-item v-else to="/user-profile" @click="drawer = false">
         <v-list-item-title>Профил</v-list-item-title>
       </v-list-item>
     </v-list>
   </v-navigation-drawer>
 </template>
+
 
 <style scoped>
 .custom-app-bar {

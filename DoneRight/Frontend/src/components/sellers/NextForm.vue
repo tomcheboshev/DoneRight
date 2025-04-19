@@ -89,7 +89,7 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { db } from '@/firebase'
-import { collection, addDoc, Timestamp } from 'firebase/firestore'
+import { collection, addDoc, Timestamp, doc, updateDoc } from 'firebase/firestore'
 import { getAuth } from 'firebase/auth'
 
 const router = useRouter()
@@ -133,15 +133,23 @@ const submitMasterProfile = async () => {
   }
 
   try {
+    // 1. Add service
     const docRef = await addDoc(collection(db, 'services'), {
       ...form.value,
       userId: user.uid,
       createdAt: Timestamp.fromDate(new Date()),
     })
-    console.log('Master profile added with ID:', docRef.id)
-    router.push('/profile-picture')
+    console.log('Service added with ID:', docRef.id)
+
+    // 2. Update user profile to set isSeller: true
+    const userDocRef = doc(db, 'users', user.uid)
+    await updateDoc(userDocRef, { isSeller: true })
+
+    // 3. Redirect
+    router.push('/success')
   } catch (e) {
-    console.error('Error adding document:', e)
+    console.error('Error:', e)
+    alert('Настана грешка. Обидете се повторно.')
   }
 }
 
@@ -149,6 +157,7 @@ const redirectToPreviousForm = () => {
   router.push('/apply')
 }
 </script>
+
 
 <style scoped>
 .background {
