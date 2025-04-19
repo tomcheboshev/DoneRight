@@ -1,7 +1,16 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import { collection, getDocs, query, where, doc, getDoc } from 'firebase/firestore'
+import {
+  collection,
+  getDocs,
+  query,
+  where,
+  doc,
+  getDoc,
+  updateDoc
+} from 'firebase/firestore'
+import { getAuth, onAuthStateChanged } from 'firebase/auth'
 import { db } from '@/firebase'
 
 const router = useRouter()
@@ -12,6 +21,7 @@ const searchService = ref('')
 const searchCity = ref('')
 const currentPage = ref(1)
 const itemsPerPage = 8
+const userDocId = ref(null)
 
 const allServices = [
   'Електричар', 'Водоводџија', 'Молер', 'Механичар', 'Дрводелец', 'Техничар',
@@ -52,13 +62,29 @@ const getJobIcon = (job) => {
   return icons[job] || '💼'
 }
 
-const toggleFavorite = (service) => {
-  const index = favorites.value.findIndex(f => f.id === service.id)
-  if (index === -1) favorites.value.push(service)
-  else favorites.value.splice(index, 1)
+const toggleFavorite = async (service) => {
+  const auth = getAuth()
+  const currentUser = auth.currentUser
+  if (!currentUser || !userDocId.value) return
+
+  const userRef = doc(db, 'users', userDocId.value)
+  const currentFavorites = [...favorites.value]
+  const index = currentFavorites.indexOf(service.id)
+
+  if (index === -1) {
+    currentFavorites.push(service.id)
+    favorites.value.push(service.id)
+  } else {
+    currentFavorites.splice(index, 1)
+    favorites.value = favorites.value.filter(id => id !== service.id)
+  }
+
+  await updateDoc(userRef, {
+    favourites: currentFavorites
+  })
 }
 
-const isFavorite = (service) => favorites.value.some(f => f.id === service.id)
+const isFavorite = (service) => favorites.value.includes(service.id)
 
 const goToDetails = (service) => {
   router.push({ path: `/service/${service.id}` })
@@ -67,8 +93,22 @@ const goToDetails = (service) => {
 const loadServices = async () => {
   isLoading.value = true
   try {
-    const serviceSnapshot = await getDocs(collection(db, 'services'))
+    const auth = getAuth()
+    const currentUser = auth.currentUser
 
+    if (currentUser) {
+      const userQuery = query(collection(db, 'users'), where('uid', '==', currentUser.uid))
+      const userSnap = await getDocs(userQuery)
+
+      if (!userSnap.empty) {
+        const userDoc = userSnap.docs[0]
+        userDocId.value = userDoc.id
+        const userData = userDoc.data()
+        favorites.value = userData.favourites || []
+      }
+    }
+
+    const serviceSnapshot = await getDocs(collection(db, 'services'))
     const enriched = await Promise.all(serviceSnapshot.docs.map(async docSnap => {
       const data = docSnap.data()
       const uid = data.userId
@@ -117,7 +157,12 @@ const loadServices = async () => {
 }
 
 onMounted(() => {
-  loadServices()
+  const auth = getAuth()
+  onAuthStateChanged(auth, (user) => {
+    if (user) {
+      loadServices()
+    }
+  })
 })
 </script>
 
