@@ -38,6 +38,9 @@ import {
   faBriefcase,
   faArrowRight,
   faCheckCircle,
+  faFan,
+  faLayerGroup,
+  faShieldAlt
 } from '@fortawesome/free-solid-svg-icons'
 
 // Set up Vuetify
@@ -73,7 +76,10 @@ library.add(
   faFacebookF, 
   faTwitter, 
   faInstagram, 
-  faLinkedin
+  faLinkedin,
+  faFan,
+  faLayerGroup,
+  faShieldAlt
 )
 
 app.use(createPinia())

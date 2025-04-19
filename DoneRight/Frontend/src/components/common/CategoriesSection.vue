@@ -28,9 +28,11 @@ const services = [
   { label: 'Техничар', icon: ['fas', 'bolt'] },
   { label: 'Инженер', icon: ['fas', 'cogs'] },
   { label: 'Монтер', icon: ['fas', 'door-open'] },
-  { label: 'Чистач', icon: ['fas', 'water'] }
+  { label: 'Чистач', icon: ['fas', 'water'] },
+  { label: 'Климатизација', icon: ['fas', 'fan'] },
+  { label: 'Изолација', icon: ['fas', 'layer-group'] },
+  { label: 'Градежен', icon: ['fas', 'hammer'] }
 ];
-
 </script>
 
 <style scoped>

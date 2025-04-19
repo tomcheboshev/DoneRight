@@ -4,146 +4,175 @@ import QrCodeImage from '@/assets/QR.png'
 
 <template>
   <section id="mobile-app" class="mobile-app-section">
-        <div class="content">
-            <div class="text-content">
-                <h1>Преземете ја нашата мобилна апликација</h1>
-                <p>Најдете ги најдобрите професионалци во секое време и насекаде со нашата мобилна апликација. Достапно за iOS и Android.</p>
-                <div class="app-buttons">
-                    <a href="#" class="app-store"><font-awesome-icon :icon="['fab', 'apple']" class="app-icon"/> App Store</a>
-                    <a href="#" class="play-store"><font-awesome-icon :icon="['fab', 'google-play']" class="app-icon"/> Google Play</a>
-                </div>
-            </div>
-            <div class="qr-code-content">
-                <img :src="QrCodeImage" alt="Преземи QR Код" class="qr-code-img">
-            </div>
+    <div class="content">
+      <div class="text-content">
+        <h1>📱 Преземете ја нашата мобилна апликација</h1>
+        <p>
+          Најдете ги најдобрите професионалци во секое време и насекаде со нашата мобилна апликација.<br>
+          Достапна за iOS и Android уреди.
+        </p>
+
+        <div class="app-buttons">
+          <a href="#" class="app-store">
+            <font-awesome-icon :icon="['fab', 'apple']" class="app-icon" />
+            App Store
+          </a>
+          <a href="#" class="play-store">
+            <font-awesome-icon :icon="['fab', 'google-play']" class="app-icon" />
+            Google Play
+          </a>
         </div>
-    </section>
+      </div>
+
+      <div class="qr-code-content">
+        <img :src="QrCodeImage" alt="Преземи QR Код" class="qr-code-img" />
+      </div>
+    </div>
+  </section>
 </template>
 
 <style scoped>
 .mobile-app-section {
-  background-color: #212529;
-  color: white;
-  padding: 70px 15px;
-  border-radius: 15px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin: 15px 15px;
-  position: relative;
+  background: linear-gradient(135deg, #1f1f1f, #121212);
+  padding: 80px 20px;
+  color: #fff;
+  border-radius: 20px;
+  margin: 30px auto;
+  max-width: 1200px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
   overflow: hidden;
-  flex-wrap: wrap;
-}
-
-/* Стилови за содржината */
-.mobile-app-section .content {
-  display: flex;
-  flex-wrap: wrap;
-  max-width: 1000px;
-  align-items: center;
-  gap: 40px;
   position: relative;
-  z-index: 2;
 }
 
-.mobile-app-section .text-content {
-  flex: 1;
-  max-width: 50%;
-  text-align: center;
-  padding: 10px;
-}
-
-.mobile-app-section .text-content h1 {
-  font-size: 2.5rem;
-  margin-bottom: 15px;
-  color: #ffc107;
-  animation: fadeIn 1.5s ease-in-out;
-}
-
-.mobile-app-section .text-content p {
-  font-size: 1.2rem;
-  margin-bottom: 25px;
-  line-height: 1.5;
-  animation: fadeIn 1.5s ease-in-out 0.5s;
-}
-
-/* Стилови за копчињата */
-.mobile-app-section .app-buttons {
+.content {
   display: flex;
-  justify-content: center;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 40px;
+}
+
+.text-content {
+  flex: 1;
+  min-width: 300px;
+  padding: 10px;
+  animation: fadeInLeft 1s ease;
+}
+
+.text-content h1 {
+  font-size: 2.6rem;
+  color: #ffc107;
+  font-weight: 700;
+  margin-bottom: 18px;
+}
+
+.text-content p {
+  font-size: 1.2rem;
+  line-height: 1.7;
+  color: #dddddd;
+  margin-bottom: 30px;
+}
+
+.app-buttons {
+  display: flex;
   gap: 15px;
   flex-wrap: wrap;
+  justify-content: flex-start;
 }
 
-.mobile-app-section .app-buttons a {
-  text-decoration: none;
+.app-buttons a {
   background: #ffc107;
-  color: #212529;
-  padding: 18px 28px;
+  color: #121212;
+  padding: 14px 26px;
   border-radius: 12px;
-  font-size: 1.1rem;
-  font-weight: bold;
+  font-weight: 600;
+  font-size: 1.05rem;
   display: flex;
   align-items: center;
   gap: 10px;
-  transition: all 0.4s ease;
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+  text-decoration: none;
+  transition: all 0.3s ease;
+  box-shadow: 0 6px 15px rgba(255, 193, 7, 0.25);
 }
 
-.mobile-app-section .app-buttons a:hover {
-  transform: translateY(-5px) scale(1.1);
+.app-buttons a:hover {
   background: #e6a700;
+  transform: translateY(-3px) scale(1.03);
+  box-shadow: 0 10px 20px rgba(255, 193, 7, 0.4);
 }
 
-/* Стилови за QR кодот */
-.mobile-app-section .qr-code-content {
+.qr-code-content {
   flex: 1;
-  max-width: 50%;
   text-align: center;
-  padding: 10px;
+  animation: fadeInRight 1s ease;
 }
 
-.mobile-app-section .qr-code-img {
-  max-width: 100%;
-  height: auto;
-  border-radius: 15px;
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+.qr-code-img {
+  max-width: 280px;
+  width: 100%;
+  border-radius: 12px;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4);
+  transition: transform 0.3s ease;
 }
 
-/* Респонзивен дизајн */
-@media (max-width: 1200px) {
-  .mobile-app-section {
-    margin: 50px 20px;
+.qr-code-img:hover {
+  transform: scale(1.05);
+}
+
+/* Animations */
+@keyframes fadeInLeft {
+  0% {
+    opacity: 0;
+    transform: translateX(-40px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0);
   }
 }
 
-@media (max-width: 1024px){
-  .mobile-app-section .qr-code-content {
-    display: none;
+@keyframes fadeInRight {
+  0% {
+    opacity: 0;
+    transform: translateX(40px);
   }
-  .mobile-app-section .text-content {
-    max-width: 100%;
+  100% {
+    opacity: 1;
+    transform: translateX(0);
   }
 }
 
-@media (max-width: 768px) {
-  .mobile-app-section {
+/* Responsive */
+@media (max-width: 1024px) {
+  .content {
     flex-direction: column;
-    padding: 50px 15px;
+    align-items: center;
   }
 
-  .mobile-app-section .text-content {
-    max-width: 100%;
-    text-align: center;
+  .qr-code-content {
+    margin-top: 30px;
   }
 
-  .mobile-app-section .qr-code-content {
-    margin-top: 20px;
-    text-align: center;
+  .text-content h1 {
+    font-size: 2.2rem;
   }
-  
-  .mobile-app-section .qr-code-img {
-    max-width: 60%;
+
+  .app-buttons {
+    justify-content: center;
+  }
+}
+
+@media (max-width: 600px) {
+  .text-content p {
+    font-size: 1.05rem;
+  }
+
+  .text-content h1 {
+    font-size: 1.9rem;
+  }
+
+  .qr-code-img {
+    max-width: 180px;
   }
 }
 </style>

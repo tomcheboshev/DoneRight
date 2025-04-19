@@ -1,21 +1,39 @@
+<script setup>
+import { ref, onMounted } from 'vue'
+import { getAuth, onAuthStateChanged } from 'firebase/auth'
+
+const drawer = ref(false)
+const isLoggedIn = ref(true)
+
+onMounted(() => {
+  const auth = getAuth()
+  onAuthStateChanged(auth, (user) => {
+    isLoggedIn.value = !!user
+  })
+})
+</script>
+
 <template>
-  <v-app-bar
-    app
-    flat
-    height="80"
-    class="custom-app-bar"
-  >
+  <v-app-bar app flat height="96" class="custom-app-bar">
     <!-- Logo -->
-    <v-toolbar-title class="font-weight-bold text-white text-h5">
-      <RouterLink to="/" class="text-decoration-none text-yellow-darken-2">
-        Најди Мајстор
+    <v-toolbar-title class="d-flex align-center">
+      <RouterLink to="/" class="d-inline-flex align-center text-decoration-none">
+        <img
+          src="@/assets/logo.png"
+          alt="Најди Мајстор"
+          height="50"
+          class="mr-3"
+        />
+        <span class="text-white font-weight-bold text-h5 d-none d-sm-inline">
+          DoneRight
+        </span>
       </RouterLink>
     </v-toolbar-title>
 
-    <v-spacer></v-spacer>
+    <v-spacer />
 
-    <!-- Desktop links -->
-    <div class="d-none d-md-flex align-center gap-5">
+    <!-- Desktop Nav -->
+    <div class="d-none d-md-flex align-center gap-6">
       <v-btn to="/" variant="text" class="nav-btn">Почетна</v-btn>
       <v-btn to="/services" variant="text" class="nav-btn">Услуги</v-btn>
       <v-btn v-if="isLoggedIn" to="/favourite" variant="text" class="nav-btn">Омилени</v-btn>
@@ -25,24 +43,21 @@
       <v-btn
         v-if="!isLoggedIn"
         to="/login"
-        color="yellow-darken-2"
-        class="text-black font-weight-bold px-4"
+        class="login-btn-gradient text-capitalize"
+        height="44"
         rounded
+        elevation="4"
       >
-        Најави се
+        <v-icon start size="20">mdi-login</v-icon>
+        <span class="font-weight-bold">Најави се</span>
       </v-btn>
 
-      <v-btn
-        v-else
-        to="/user-profile"
-        icon
-        class="text-yellow-darken-2"
-      >
-        <v-icon size="28">mdi-account</v-icon>
+      <v-btn v-else to="/user-profile" icon class="text-yellow-darken-2">
+        <v-icon size="32">mdi-account</v-icon>
       </v-btn>
     </div>
 
-    <!-- Mobile drawer toggle -->
+    <!-- Mobile Nav Toggle -->
     <v-app-bar-nav-icon
       @click="drawer = !drawer"
       class="d-md-none text-yellow-darken-2"
@@ -50,7 +65,13 @@
   </v-app-bar>
 
   <!-- Mobile Drawer -->
-  <v-navigation-drawer v-model="drawer" app temporary color="#212529">
+  <v-navigation-drawer
+    v-model="drawer"
+    app
+    temporary
+    color="#212529"
+    class="mobile-drawer"
+  >
     <v-list nav dense class="text-white">
       <v-list-item to="/" @click="drawer = false">
         <v-list-item-title>Почетна</v-list-item-title>
@@ -77,34 +98,37 @@
   </v-navigation-drawer>
 </template>
 
-<script setup>
-import { ref, onMounted } from 'vue'
-import { getAuth, onAuthStateChanged } from 'firebase/auth'
-
-const drawer = ref(false)
-const isLoggedIn = ref(false)
-
-onMounted(() => {
-  const auth = getAuth()
-  onAuthStateChanged(auth, (user) => {
-    isLoggedIn.value = !!user
-  })
-})
-</script>
-
 <style scoped>
 .custom-app-bar {
   background: rgba(0, 0, 0, 0.85);
-  backdrop-filter: blur(10px);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 
 .nav-btn {
   color: white;
   font-weight: 600;
-  font-size: 1.1rem;
+  font-size: 1.15rem;
   text-transform: none;
+  letter-spacing: 0.5px;
+  position: relative;
   transition: all 0.3s ease;
+}
+
+.nav-btn::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -6px;
+  height: 2px;
+  width: 0;
+  background-color: #ffc107;
+  transition: width 0.3s ease;
+}
+
+.nav-btn:hover::after {
+  width: 100%;
 }
 
 .nav-btn:hover {
@@ -112,8 +136,33 @@ onMounted(() => {
   text-shadow: 0 0 10px #ffc107;
 }
 
+.login-btn-gradient {
+  background: linear-gradient(135deg, #ffc107, #ff8c00);
+  color: #212529;
+  font-size: 1rem;
+  padding: 0 20px;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 10px rgba(255, 193, 7, 0.3);
+}
+
+.login-btn-gradient:hover {
+  background: linear-gradient(135deg, #ffdd33, #e3a600);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 15px rgba(255, 193, 7, 0.4);
+}
+
+/* Drawer Animation */
+.mobile-drawer {
+  transition: transform 0.4s ease;
+}
+
 .v-list-item-title {
   font-weight: 600;
   font-size: 1rem;
+  transition: color 0.3s ease;
+}
+
+.v-list-item-title:hover {
+  color: #ffc107;
 }
 </style>

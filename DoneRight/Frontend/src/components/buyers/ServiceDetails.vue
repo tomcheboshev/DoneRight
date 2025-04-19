@@ -12,128 +12,113 @@ const goBack = () => {
 
 <template>
   <DefaultLayout>
-    <div class="details-container">
-      <div class="details-card">
-        <div class="image-wrapper">
-          <img :src="route.query.image" alt="Service Provider" class="profile-pic" />
-        </div>
-        <h2 class="name">{{ route.query.name }} {{ route.query.lastName }}</h2>
-        <h4 class="job-title">{{ route.query.job }}</h4>
-        <p class="description">{{ route.query.description }}</p>
+    <v-container class="py-12 details-container" fluid>
+      <v-row align="center" justify="center">
+        <v-col cols="12" sm="8" md="6" lg="4">
+          <v-card class="details-card" elevation="12" rounded="xl">
+            <v-img
+              :src="route.query.image"
+              height="220"
+              cover
+              class="rounded-t-xl"
+            />
 
-        <div class="actions">
-          <button class="contact-btn">Hire Now</button>
-          <button class="back-btn" @click="goBack">Go Back</button>
-        </div>
-      </div>
-    </div>
+            <v-card-title class="text-center">
+              <h2 class="name">{{ route.query.name }} {{ route.query.lastName }}</h2>
+            </v-card-title>
+
+            <v-card-subtitle class="text-center job-title mb-4">
+              {{ route.query.job }}
+            </v-card-subtitle>
+
+            <v-card-text class="description text-center">
+              {{ route.query.description || 'Описот не е достапен.' }}
+            </v-card-text>
+
+            <v-card-actions class="justify-center mt-4">
+              <v-btn
+                color="primary"
+                class="contact-btn"
+                rounded
+                size="large"
+              >
+                <v-icon start>mdi-handshake</v-icon>
+                Hire Now
+              </v-btn>
+              <v-btn
+                color="grey lighten-2"
+                class="back-btn"
+                rounded
+                size="large"
+                @click="goBack"
+              >
+                <v-icon start>mdi-arrow-left</v-icon>
+                Go Back
+              </v-btn>
+            </v-card-actions>
+          </v-card>
+        </v-col>
+      </v-row>
+    </v-container>
   </DefaultLayout>
 </template>
 
 <style scoped>
-/* ---- CONTAINER ---- */
 .details-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
-  background: linear-gradient(135deg, #f8f9fa, #dde1e7);
-  padding: 20px;
+  background: linear-gradient(135deg, #f4f7f9, #e0e5eb);
+  min-height: 100vh;
 }
 
-/* ---- CARD DESIGN ---- */
 .details-card {
-  background: white;
-  padding: 40px;
-  border-radius: 15px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-  text-align: center;
-  max-width: 450px;
-  width: 100%;
-  transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+  transition: all 0.3s ease-in-out;
+  overflow: hidden;
 }
 
 .details-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+  transform: translateY(-4px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
 }
 
-/* ---- IMAGE WRAPPER ---- */
-.image-wrapper {
-  width: 100%;
-  height: 220px;
-  border-radius: 15px;
-  overflow: hidden;
-  margin-bottom: 20px;
-}
-
-.profile-pic {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  transition: transform 0.4s ease-in-out;
-}
-
-.details-card:hover .profile-pic {
-  transform: scale(1.05);
-}
-
-/* ---- TEXT STYLING ---- */
 .name {
-  font-size: 26px;
-  font-weight: bold;
+  font-weight: 700;
+  font-size: 1.7rem;
   color: #2c3e50;
-  margin-bottom: 5px;
 }
 
 .job-title {
-  font-size: 18px;
   font-weight: 600;
-  color: #555;
-  margin-bottom: 15px;
+  font-size: 1.1rem;
+  color: #616161;
 }
 
 .description {
-  font-size: 15px;
-  color: #666;
+  font-size: 0.95rem;
+  color: #555;
   line-height: 1.6;
-  margin-bottom: 20px;
-  padding: 0 15px;
-}
-
-/* ---- BUTTON STYLES ---- */
-.actions {
-  display: flex;
-  gap: 10px;
-  justify-content: center;
-}
-
-.contact-btn, .back-btn {
-  padding: 12px 20px;
-  font-size: 16px;
-  font-weight: 600;
-  border-radius: 8px;
-  cursor: pointer;
-  border: none;
-  transition: all 0.3s ease;
+  padding: 0 10px;
 }
 
 .contact-btn {
-  background: linear-gradient(135deg, #4e73df, #2e59d9);
-  color: white;
+  background: linear-gradient(135deg, #42a5f5, #1e88e5);
+  color: white !important;
+  font-weight: bold;
+  box-shadow: 0 4px 10px rgba(33, 150, 243, 0.3);
+  transition: transform 0.2s ease;
 }
 
 .contact-btn:hover {
-  background: linear-gradient(135deg, #2e59d9, #1e3a8a);
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  transform: translateY(-2px);
 }
 
 .back-btn {
-  background: #e0e0e0;
-  color: #333;
+  background-color: #eeeeee !important;
+  color: #333 !important;
+  font-weight: 600;
+  transition: transform 0.2s ease;
 }
 
 .back-btn:hover {
-  background: #d6d6d6;
+  background-color: #e0e0e0 !important;
+  transform: translateY(-2px);
 }
 </style>
