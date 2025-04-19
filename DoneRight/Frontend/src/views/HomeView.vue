@@ -16,4 +16,3 @@ import Why from '@/components/common/WhyChooseUsSection.vue';
       <Why />
     </DefaultLayout>
 </template>
-

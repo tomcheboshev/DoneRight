@@ -60,7 +60,7 @@
 
 <style scoped>
 footer {
-background-color: #212529;
+background-color: black;
 color: white;
 padding: 80px 20px;
 display: flex;
@@ -116,7 +116,8 @@ transform: translateY(-5px);
 
 footer form input {
 padding: 15px;
-border: none;
+border: 1px solid white;
+color: white;
 margin-right: 5px;
 border-radius: 5px;
 font-size: 1rem;
@@ -148,7 +149,7 @@ footer .column {
 }
 
 .footer-bottom {
-background: linear-gradient(to bottom, #212529, #343a40);
+background: linear-gradient(to bottom, black, rgb(37, 24, 0));
 color: white;
 padding: 10px 20px;
 text-align: center;

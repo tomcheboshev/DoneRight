@@ -122,7 +122,7 @@ onMounted(() => {
     v-model="drawer"
     app
     temporary
-    color="#212529"
+    color="black"
     class="mobile-drawer"
   >
     <v-list nav dense class="text-white">

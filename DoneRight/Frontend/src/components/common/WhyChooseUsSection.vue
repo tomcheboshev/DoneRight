@@ -67,7 +67,7 @@ const benefits = [
 
 <style scoped>
 .why-choose-section {
-  background: linear-gradient(to bottom, #212529, #1a1a1a);
+  background: linear-gradient(135deg, #1f1f1f, #121212); /* updated */
   color: #fff;
   padding-top: 100px;
   padding-bottom: 100px;
@@ -76,23 +76,24 @@ const benefits = [
 .section-title {
   font-size: 2.5rem;
   font-weight: bold;
-  color: #ffc107;
+  color: #ffc107; /* updated */
   margin-bottom: 12px;
-  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+  text-shadow: 0 0 6px rgba(255, 193, 7, 0.4); /* updated */
 }
 
 .section-subtitle {
   font-size: 1.1rem;
-  color: #bbb;
+  color: #dddddd; /* updated */
   line-height: 1.7;
   max-width: 700px;
   margin: 0 auto;
+  text-shadow: 0 0 4px rgba(0, 0, 0, 0.3); /* updated */
 }
 
 .benefit-card {
-  background: rgba(255, 255, 255, 0.04);
+  background: rgba(255, 255, 255, 0.04); /* updated */
   backdrop-filter: blur(14px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.08); /* updated */
   border-radius: 16px;
   transition: transform 0.35s ease, box-shadow 0.35s ease;
   height: 100%;
@@ -100,7 +101,7 @@ const benefits = [
 
 .benefit-icon {
   transition: transform 0.3s ease;
-  filter: drop-shadow(0 4px 6px rgba(255, 193, 7, 0.3));
+  filter: drop-shadow(0 4px 6px rgba(255, 193, 7, 0.3)); /* updated */
 }
 
 .bounce {
@@ -115,13 +116,13 @@ const benefits = [
 
 .card-description {
   font-size: 0.98rem;
-  color: #ccc;
+  color: #ccc; /* updated */
   line-height: 1.6;
 }
 
 .benefit-card:hover {
   transform: translateY(-8px);
-  box-shadow: 0 12px 28px rgba(255, 193, 7, 0.25);
+  box-shadow: 0 12px 28px rgba(255, 193, 7, 0.25); /* updated */
 }
 
 /* Responsive text adjustments */

@@ -19,15 +19,15 @@ const scrollToNext = () => {
       <p class="hero-subtitle">
         Поврзуваме професионалци со муштерии со само неколку клика.
       </p>
+
+      <!-- Animated Floating Icon Button -->
       <v-btn
-        color="warning"
-        size="large"
-        rounded
-        class="hero-cta text-black text-capitalize"
+        icon
+        size="x-large"
+        class="hero-icon-btn"
         @click="scrollToNext"
       >
-        Побарај
-        <v-icon end>mdi-magnify</v-icon>
+        <v-icon size="36" class="hero-icon">mdi-magnify</v-icon>
       </v-btn>
     </div>
   </div>
@@ -65,6 +65,9 @@ const scrollToNext = () => {
   max-width: 880px;
   padding: 30px;
   color: white;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   animation: fadeInUp 1.3s ease-out;
 }
 
@@ -104,21 +107,31 @@ const scrollToNext = () => {
   text-shadow: 0 2px 5px rgba(0, 0, 0, 0.25);
 }
 
-.hero-cta {
-  font-weight: 700;
-  font-size: 1.1rem;
-  padding: 14px 36px;
-  box-shadow: 0 8px 20px rgba(255, 193, 7, 0.35);
-  transition: all 0.3s ease;
+/* Floating Icon Button */
+.hero-icon-btn {
+  background-color: #ffc107;
+  border-radius: 50%;
+  padding: 18px;
+  box-shadow: 0 0 20px rgba(255, 193, 7, 0.4);
+  animation: bounce 2.5s infinite ease-in-out;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
-.hero-cta:hover {
-  background: linear-gradient(135deg, #ffdd33, #e3a600);
-  transform: scale(1.07);
-  box-shadow: 0 14px 30px rgba(255, 193, 7, 0.45);
+.hero-icon-btn:hover {
+  transform: scale(1.1);
+  box-shadow: 0 0 30px rgba(255, 193, 7, 0.6);
 }
 
-/* Fade animation */
+.hero-icon {
+  color: #212529;
+  transition: transform 0.3s ease;
+}
+
+.hero-icon-btn:hover .hero-icon {
+  transform: rotate(10deg) scale(1.1);
+}
+
+/* Keyframes */
 @keyframes fadeInUp {
   from {
     opacity: 0;
@@ -127,6 +140,15 @@ const scrollToNext = () => {
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+@keyframes bounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
   }
 }
 
@@ -143,11 +165,6 @@ const scrollToNext = () => {
   .tagline {
     font-size: 0.9rem;
   }
-
-  .hero-cta {
-    font-size: 1rem;
-    padding: 12px 24px;
-  }
 }
 
 @media (max-width: 500px) {
@@ -158,11 +175,6 @@ const scrollToNext = () => {
   .hero-subtitle {
     font-size: 0.95rem;
     margin-bottom: 24px;
-  }
-
-  .hero-cta {
-    font-size: 0.95rem;
-    padding: 10px 20px;
   }
 }
 </style>

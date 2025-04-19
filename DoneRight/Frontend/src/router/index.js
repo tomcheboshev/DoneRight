@@ -14,6 +14,7 @@ import ProfilePicturePage from '@/components/sellers/ProfilePicture.vue';
 import UserProfile from '@/components/Auth/UserProfile.vue'
 import Settings from '@/components/common/Settings.vue';
 import HowItWorks from '@/components/HowItWorks/howItWorks.vue'
+import ForgotPassword from '@/components/Auth/ForgotPassword.vue';
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -32,7 +33,8 @@ const router = createRouter({
     { path: '/profile-picture', component: ProfilePicturePage },
     { path: '/user-profile', component: UserProfile },
     { path: '/settings', component: Settings },
-    { path: '/how-it-works', component: HowItWorks}
+    { path: '/how-it-works', component: HowItWorks},
+    { path: '/forgot-password', component: ForgotPassword}
   ],
 });
 

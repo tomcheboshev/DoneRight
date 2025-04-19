@@ -1,25 +1,64 @@
 <template>
-  <div class="profile-wrapper">
-    <div class="profile-card">
-      <h2>Профил на корисник</h2>
+  <v-container class="profile-wrapper fill-height" fluid>
+    <v-row align="center" justify="center">
+      <v-col cols="12" sm="10" md="8" lg="6">
+        <v-card class="profile-card" elevation="10">
+          <v-card-title class="justify-center">
+            <h2 class="text-yellow text-h5 font-weight-bold">👤 Профил на корисник</h2>
+          </v-card-title>
 
-      <div v-if="user" class="info">
-        <img :src="user.profilePicture || defaultImage" alt="Profile Picture" class="profile-image" />
-        <p><span>Име:</span> {{ user.firstName }} {{ user.lastName }}</p>
-        <p><span>Е-пошта:</span> {{ user.email }}</p>
-        <p><span>Град:</span> {{ user.city }}</p>
-        <p><span>Телефонски број:</span> {{ user.phone }}</p>
-        <div class="button-group">
-          <button @click="goToEditProfile" class="edit-btn">Aжурирај</button>
-          <button @click="logout" class="logout-btn">Одјави се</button>
-        </div>
-      </div>
+          <v-divider class="mb-4" />
 
-      <div v-else class="info">
-        <p>Не сте најавени.</p>
-      </div>
-    </div>
-  </div>
+          <v-card-text class="text-center" v-if="user">
+            <v-avatar size="120" class="mx-auto mb-4">
+              <v-img :src="user.profilePicture || defaultImage" cover />
+            </v-avatar>
+
+            <div class="mb-2">
+              <strong class="text-yellow">Име:</strong> {{ user.firstName }} {{ user.lastName }}
+            </div>
+            <div class="mb-2">
+              <strong class="text-yellow">Е-пошта:</strong> {{ user.email }}
+            </div>
+            <div class="mb-2">
+              <strong class="text-yellow">Град:</strong> {{ user.city }}
+            </div>
+            <div class="mb-2">
+              <strong class="text-yellow">Телефон:</strong> {{ user.phone }}
+            </div>
+
+            <v-row justify="center" class="mt-6">
+              <v-col cols="12" sm="6">
+                <v-btn
+                  block
+                  color="yellow-darken-2"
+                  class="text-black font-weight-bold"
+                  @click="goToEditProfile"
+                >
+                  ✏️ Aжурирај
+                </v-btn>
+              </v-col>
+              <v-col cols="12" sm="6">
+                <v-btn
+                  block
+                  color="red-darken-1"
+                  class="text-white font-weight-bold"
+                  @click="logout"
+                >
+                  🔒 Одјави се
+                </v-btn>
+              </v-col>
+            </v-row>
+          </v-card-text>
+
+          <v-card-text class="text-center" v-else>
+            <v-icon size="48" color="grey-lighten-1">mdi-account-off</v-icon>
+            <p class="text-grey-lighten-1 mt-2">Не сте најавени.</p>
+          </v-card-text>
+        </v-card>
+      </v-col>
+    </v-row>
+  </v-container>
 </template>
 
 <script setup>
@@ -29,24 +68,21 @@ import { getAuth, onAuthStateChanged, signOut } from 'firebase/auth'
 import { db } from '@/firebase'
 import { collection, getDocs, query, where, doc, getDoc } from 'firebase/firestore'
 
-const user = ref(null)
 const router = useRouter()
+const user = ref(null)
 const defaultImage = new URL('@/assets/lok.png', import.meta.url).href
 
 onMounted(() => {
   const auth = getAuth()
-
   onAuthStateChanged(auth, async (currentUser) => {
     if (currentUser) {
       try {
-        // Fetch user info
         const userQuery = query(collection(db, 'users'), where('uid', '==', currentUser.uid))
         const snapshot = await getDocs(userQuery)
 
         if (!snapshot.empty) {
           const userData = snapshot.docs[0].data()
 
-          // Fetch profile picture from userProfilePictures collection
           const profilePicRef = doc(db, 'userProfilePictures', currentUser.uid)
           const profilePicSnap = await getDoc(profilePicRef)
 
@@ -61,8 +97,6 @@ onMounted(() => {
             email: currentUser.email,
             profilePicture
           }
-        } else {
-          console.warn('User not found in Firestore.')
         }
       } catch (err) {
         console.error('Error fetching profile:', err)
@@ -85,94 +119,37 @@ const logout = async () => {
 const goToEditProfile = () => {
   router.push('/edit')
 }
-
 </script>
 
 <style scoped>
 .profile-wrapper {
-  background-color: #212529;
-  min-height: 100vh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  background: linear-gradient(135deg, #121212, #1a1a1a);
+  padding-top: 100px;
+  padding-bottom: 80px;
 }
 
 .profile-card {
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  border-radius: 16px;
-  padding: 30px 40px;
-  width: 100%;
-  max-width: 500px;
-  color: #fff;
-  backdrop-filter: blur(10px);
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
-  text-align: center;
-}
-
-.profile-image {
-  width: 120px;
-  height: 120px;
-  border-radius: 50%;
-  object-fit: cover;
-  margin-bottom: 20px;
-  border: 3px solid #ffc107;
-}
-
-h2 {
-  font-size: 24px;
-  color: #ffc107;
-  margin-bottom: 25px;
-}
-
-.info p {
-  margin: 12px 0;
-  font-size: 16px;
-}
-
-.info span {
-  font-weight: bold;
-  color: #ffc107;
-}
-
-.button-group {
-  display: flex;
-  flex-direction: column;
-  margin-top: 10px;
-  align-items: center;
-}
-
-.edit-btn {
-  margin-top: 15px;
-  background-color: #ffc107;
-  color: #212529;
-  padding: 12px 20px;
-  border: none;
-  border-radius: 10px;
-  font-weight: bold;
-  font-size: 14px;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-}
-
-.edit-btn:hover {
-  background-color: #e6b800;
-}
-
-.logout-btn {
-  margin-top: 25px;
-  background-color: #ff4d4d;
+  background: rgba(255, 255, 255, 0.04);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 20px;
   color: white;
-  padding: 12px 20px;
-  border: none;
-  border-radius: 10px;
-  font-weight: bold;
-  font-size: 14px;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4);
+  animation: fadeInUp 0.6s ease-in-out;
 }
 
-.logout-btn:hover {
-  background-color: #e60000;
+.text-yellow {
+  color: #ffc107;
+}
+
+@keyframes fadeInUp {
+  0% {
+    transform: translateY(30px);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(0px);
+    opacity: 1;
+  }
 }
 </style>
