@@ -9,9 +9,13 @@
 
       <v-row class="steps-grid" justify="center" align="stretch">
         <!-- Step 1 -->
-        <v-col cols="12" sm="6" md="4">
+        <v-col cols="12" md="6" lg="4">
           <v-card class="step-card" elevation="4">
-            <v-card-title class="step-title">1. Регистрирај се</v-card-title>
+            <div class="step-icon">
+              <i class="mdi mdi-account-plus" />
+              <span class="step-number">1</span>
+            </div>
+            <v-card-title class="step-title">Регистрирај се</v-card-title>
             <v-card-text class="step-text">
               Немаш профил? Креирај нов за да започнеш со користење на платформата.
             </v-card-text>
@@ -22,9 +26,13 @@
         </v-col>
 
         <!-- Step 2 -->
-        <v-col cols="12" sm="6" md="4">
+        <v-col cols="12" md="6" lg="4">
           <v-card class="step-card" elevation="4">
-            <v-card-title class="step-title">2. Најави се</v-card-title>
+            <div class="step-icon">
+              <i class="mdi mdi-login" />
+              <span class="step-number">2</span>
+            </div>
+            <v-card-title class="step-title">Најави се</v-card-title>
             <v-card-text class="step-text">
               Веќе имаш профил? Најави се и продолжи со следниот чекор.
             </v-card-text>
@@ -35,9 +43,13 @@
         </v-col>
 
         <!-- Step 3 -->
-        <v-col cols="12" sm="6" md="4">
+        <v-col cols="12" md="6" lg="4">
           <v-card class="step-card" elevation="4">
-            <v-card-title class="step-title">3. Објави услуга</v-card-title>
+            <div class="step-icon">
+              <i class="mdi mdi-briefcase-plus" />
+              <span class="step-number">3</span>
+            </div>
+            <v-card-title class="step-title">Објави услуга</v-card-title>
             <v-card-text class="step-text">
               Ако си најавен, објави ја твојата прва услуга и започни да работиш.
             </v-card-text>
@@ -79,6 +91,8 @@ const handleNextStep = () => {
 </script>
 
 <style scoped>
+@import '@mdi/font/css/materialdesignicons.min.css';
+
 .how-it-works {
   background-color: #212529;
   color: white;
@@ -132,6 +146,8 @@ const handleNextStep = () => {
   border-radius: 16px;
   padding: 10px;
   transition: transform 0.3s ease;
+  position: relative;
+  overflow: hidden;
 }
 .step-card:hover {
   transform: translateY(-5px);
@@ -142,6 +158,7 @@ const handleNextStep = () => {
   color: #ffc107;
   font-weight: bold;
   font-size: 20px;
+  margin-top: 10px;
   margin-bottom: 10px;
 }
 
@@ -154,4 +171,29 @@ const handleNextStep = () => {
 .v-card-actions {
   padding: 16px;
 }
+
+.step-icon {
+  font-size: 48px;
+  margin-top: 10px;
+  color: #ffc107;
+  position: relative;
+}
+
+.step-number {
+  position: absolute;
+  top: -12px;
+  right: -12px;
+  background: #ffc107;
+  color: black;
+  font-weight: 700;
+  width: 34px;
+  height: 34px;
+  font-size: 16px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+}
 </style>
+
