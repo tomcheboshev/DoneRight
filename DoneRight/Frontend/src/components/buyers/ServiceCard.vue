@@ -2,7 +2,13 @@
 import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import {
-  collection, getDocs, query, where, doc, getDoc, updateDoc
+  collection,
+  getDocs,
+  query,
+  where,
+  doc,
+  getDoc,
+  updateDoc
 } from 'firebase/firestore'
 import { getAuth, onAuthStateChanged } from 'firebase/auth'
 import { db } from '@/firebase'
@@ -68,31 +74,34 @@ const toggleFavorite = async (service) => {
 
 const isFavorite = (service) => favorites.value.includes(service.id)
 
-const goToDetails = (service) => router.push({ path: `/service/${service.id}` })
+const goToDetails = (service) => {
+  router.push({ path: `/service/${service.id}` })
+}
+
+const loadUserFavorites = async (uid) => {
+  const userQuery = query(collection(db, 'users'), where('uid', '==', uid))
+  const userSnap = await getDocs(userQuery)
+
+  if (!userSnap.empty) {
+    const userDoc = userSnap.docs[0]
+    userDocId.value = userDoc.id
+    favorites.value = userDoc.data().favourites || []
+  }
+}
 
 const loadServices = async () => {
   isLoading.value = true
   try {
-    const auth = getAuth()
-    const currentUser = auth.currentUser
-
-    if (currentUser) {
-      const userQuery = query(collection(db, 'users'), where('uid', '==', currentUser.uid))
-      const userSnap = await getDocs(userQuery)
-
-      if (!userSnap.empty) {
-        const userDoc = userSnap.docs[0]
-        userDocId.value = userDoc.id
-        favorites.value = userDoc.data().favourites || []
-      }
-    }
-
     const serviceSnapshot = await getDocs(collection(db, 'services'))
+
     const enriched = await Promise.all(serviceSnapshot.docs.map(async docSnap => {
       const data = docSnap.data()
       const uid = data.userId
 
-      let firstName = 'Име', lastName = '', image = new URL('@/assets/lok.png', import.meta.url).href, location = 'Непознато'
+      let firstName = 'Име'
+      let lastName = ''
+      let image = new URL('@/assets/lok.png', import.meta.url).href
+      let location = 'Непознато'
 
       if (uid) {
         const q = query(collection(db, 'users'), where('uid', '==', uid))
@@ -107,7 +116,10 @@ const loadServices = async () => {
 
         const picSnap = await getDoc(doc(db, 'userProfilePictures', uid))
         if (picSnap.exists()) {
-          image = picSnap.data().profilePicture || image
+          const picData = picSnap.data()
+          if (picData.profilePicture) {
+            image = picData.profilePicture
+          }
         }
       }
 
@@ -124,19 +136,27 @@ const loadServices = async () => {
 
     services.value = enriched
   } catch (error) {
-    console.error('Error loading:', error)
+    console.error('Error loading services:', error)
   } finally {
     isLoading.value = false
   }
 }
 
-onMounted(() => {
+onMounted(async () => {
   const auth = getAuth()
-  onAuthStateChanged(auth, (user) => {
-    if (user) loadServices()
+
+  // Always load services, even if not logged in
+  await loadServices()
+
+  // If logged in, load user favorites
+  onAuthStateChanged(auth, async (user) => {
+    if (user) {
+      await loadUserFavorites(user.uid)
+    }
   })
 })
 </script>
+
 
 <template>
   <v-app>
