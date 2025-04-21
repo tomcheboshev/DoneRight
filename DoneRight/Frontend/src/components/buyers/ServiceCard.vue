@@ -11,10 +11,12 @@ const router = useRouter()
 const services = ref([])
 const favorites = ref([])
 const isLoading = ref(true)
+
+const searchName = ref('')
 const searchService = ref('')
 const searchCity = ref('')
 const currentPage = ref(1)
-const itemsPerPage = 8
+const itemsPerPage = 4
 const userDocId = ref(null)
 
 const allServices = ['Електричар', 'Водоводџија', 'Молер', 'Механичар', 'Дрводелец', 'Техничар', 'Инженер', 'Монтер', 'Чистач']
@@ -23,7 +25,8 @@ const cities = ['Скопје', 'Битола', 'Тетово', 'Куманов�
 const filteredServicesList = computed(() =>
   services.value.filter(s =>
     (!searchCity.value || s.location === searchCity.value) &&
-    (!searchService.value || s.job.toLowerCase().includes(searchService.value.toLowerCase()))
+    (!searchService.value || s.job.toLowerCase().includes(searchService.value.toLowerCase())) &&
+    (!searchName.value || `${s.name} ${s.lastName}`.toLowerCase().includes(searchName.value.toLowerCase()))
   )
 )
 
@@ -139,28 +142,43 @@ onMounted(() => {
   <v-app>
     <section class="search-section">
       <v-container>
-        <div class="header text-center mb-10 animate-header">
-  <h1 class="main-title"> Најди Мајстор</h1>
-  <p class="subtitle-text">Пронајди професионалци по локација и услуга</p>
-</div>
+        <div class="header text-center mb-7 animate-header">
+          <h1 class="main-title">Најди Мајстор</h1>
+          <p class="subtitle-text">Пронајди професионалци по локација и услуга</p>
+        </div>
 
-
-        <v-row justify="center" class="mb-3 gap-inputs">
+        <!-- Name Search Field -->
+        <v-row justify="center" class="compact-gap" >
           <v-col cols="12" md="5">
+            <v-text-field
+              v-model="searchName"
+              label="Пребарај по име"
+              density="comfortable"
+              variant="outlined"
+              color="warning"
+              prepend-inner-icon="mdi-account-search"
+              clearable
+            />
+          </v-col>
+        </v-row>
+
+        <!-- Filters -->
+        <v-row justify="center" class="mb-3 gap-inputs">
+          <v-col cols="12" md="3">
             <v-autocomplete
-            v-model="searchService"
-            :items="allServices"
-            label="Тип на услуга"
-            density="comfortable"
-            variant="outlined"
-            color="warning"
-            class="custom-input"
-            hide-no-data
-            menu-icon="mdi-chevron-down"
-          />
+              v-model="searchService"
+              :items="allServices"
+              label="Тип на услуга"
+              density="comfortable"
+              variant="outlined"
+              color="warning"
+              hide-no-data
+              clearable
+              menu-icon="mdi-chevron-down"
+            />
           </v-col>
 
-          <v-col cols="12" md="5">
+          <v-col cols="12" md="3">
             <v-select
               v-model="searchCity"
               :items="cities"
@@ -168,12 +186,13 @@ onMounted(() => {
               density="comfortable"
               variant="outlined"
               color="warning"
-              class="custom-input"
               clearable
+              menu-icon="mdi-chevron-down"
             />
           </v-col>
         </v-row>
 
+        <!-- Service Cards -->
         <v-row v-if="paginatedServices.length">
           <v-col
             v-for="service in paginatedServices"
@@ -190,17 +209,13 @@ onMounted(() => {
                 elevation="8"
                 :class="{ 'hovered': isHovering }"
               >
-              <v-img :src="service.image" height="260px" cover  />
+                <v-img :src="service.image" height="260px" cover />
                 <v-card-text>
                   <div class="d-flex justify-space-between align-center mb-1">
                     <h3 class="text-yellow text-subtitle-1 font-weight-bold">
                       {{ service.name }} {{ service.lastName }}
                     </h3>
-                    <v-btn
-                      icon
-                      variant="plain"
-                      @click="toggleFavorite(service)"
-                    >
+                    <v-btn icon variant="plain" @click="toggleFavorite(service)">
                       <v-icon :color="isFavorite(service) ? 'yellow' : 'grey'">mdi-star</v-icon>
                     </v-btn>
                   </div>
@@ -221,6 +236,7 @@ onMounted(() => {
           </v-col>
         </v-row>
 
+        <!-- No Results -->
         <v-row v-else justify="center" class="text-center mt-10">
           <v-col cols="12">
             <v-icon size="64" color="grey-lighten-1" class="mb-2 bounce">mdi-account-search</v-icon>
@@ -229,6 +245,7 @@ onMounted(() => {
           </v-col>
         </v-row>
 
+        <!-- Pagination -->
         <v-row justify="center" class="mt-6">
           <v-pagination
             v-model="currentPage"
@@ -242,8 +259,14 @@ onMounted(() => {
   </v-app>
 </template>
 
-
 <style scoped>
+.search-section {
+  background: linear-gradient(135deg, #1c1c1c, #101010);
+  min-height: 100vh;
+  padding-top: 100px;
+  padding-bottom: 60px;
+  color: white;
+}
 
 .header {
   padding-top: 10px;
@@ -278,43 +301,6 @@ onMounted(() => {
   }
 }
 
-.search-section {
-  background: linear-gradient(135deg, #1c1c1c, #101010);
-  min-height: 100vh;
-  padding-top: 100px;
-  padding-bottom: 50px;
-  color: white;
-}
-
-/* Updated deep selectors */
-.input-field :deep(.v-field) {
-  background-color: #222 !important;
-  border: 1px solid #444;
-  border-radius: 12px;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.2);
-  transition: all 0.3s ease;
-}
-
-.input-field:hover :deep(.v-field) {
-  border-color: #ffc107;
-  box-shadow: 0 0 12px rgba(255, 193, 7, 0.2);
-}
-
-.input-field:focus-within :deep(.v-field) {
-  border-color: #ffc107;
-  box-shadow: 0 0 18px rgba(255, 193, 7, 0.35);
-}
-
-.input-field :deep(.v-label) {
-  color: #aaa !important;
-  font-weight: 600;
-  letter-spacing: 0.5px;
-}
-
-.input-field :deep(.v-field__input) {
-  color: white !important;
-}
-
 .profile-card {
   background: rgba(255, 255, 255, 0.04);
   border: 1px solid rgba(255, 255, 255, 0.08);
@@ -329,20 +315,6 @@ onMounted(() => {
   box-shadow: 0 12px 24px rgba(255, 193, 7, 0.3);
 }
 
-.subtitle {
-  font-size: 0.95rem;
-  color: #ccc;
-  margin-bottom: 4px;
-}
-
-.favorite-btn {
-  position: absolute;
-  top: 12px;
-  right: 12px;
-  background-color: #000;
-  border-radius: 50%;
-}
-
 .bounce {
   animation: bounce 1.5s infinite;
 }
@@ -351,4 +323,10 @@ onMounted(() => {
   0%, 100% { transform: translateY(0); }
   50% { transform: translateY(-6px); }
 }
+
+.compact-gap {
+  margin-bottom: -35px;
+}
+
+
 </style>

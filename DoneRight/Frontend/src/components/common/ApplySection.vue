@@ -63,14 +63,16 @@ const isLoggedIn = ref(false)
 </template>
 
 <style scoped>
-/* Base Section */
 .apply-section {
-  padding: 120px 20px;
-  background: radial-gradient(circle, #1c1c1c, #121212);
   position: relative;
-  overflow: hidden;
+  padding: 120px 20px;
   color: white;
+  overflow: hidden;
+  z-index: 1;
+  background: linear-gradient(135deg, #1f1f1f, #121212); /* updated */
 }
+
+
 
 /* Content Layout */
 .content {

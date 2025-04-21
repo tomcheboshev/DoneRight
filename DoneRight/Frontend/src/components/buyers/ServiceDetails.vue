@@ -1,6 +1,7 @@
 <script setup>
 import { useRoute, useRouter } from "vue-router";
 import DefaultLayout from "@/layouts/DefaultLayout.vue";
+// import { ref } from "vue";
 
 const route = useRoute();
 const router = useRouter();
@@ -8,117 +9,217 @@ const router = useRouter();
 const goBack = () => {
   router.push("/services");
 };
+
+const availability = "Онлајн"; // Example: Онлајн / Зафатен / Недостапен
+
+const reviews = [
+  { name: "Ана", rating: 5, comment: "Одличен мајстор, многу професионален!" },
+  { name: "Игор", rating: 4, comment: "Задоволен сум од услугата. Препорачувам!" }
+];
+
+const portfolioImages = [
+  new URL('@/assets/workers.png', import.meta.url).href,
+  new URL('@/assets/workers.png', import.meta.url).href
+];
+
+const averageRating = reviews.reduce((a, b) => a + b.rating, 0) / reviews.length;
 </script>
 
 <template>
   <DefaultLayout>
-    <v-container class="py-12 details-container" fluid>
-      <v-row align="center" justify="center">
-        <v-col cols="12" sm="8" md="6" lg="4">
-          <v-card class="details-card" elevation="12" rounded="xl">
-            <v-img
-              :src="route.query.image"
-              height="220"
-              cover
-              class="rounded-t-xl"
-            />
-
-            <v-card-title class="text-center">
+    <section class="details-wrapper">
+      <v-container>
+        <v-row justify="center">
+          <v-col cols="12" md="8" lg="6">
+            <div class="profile-box">
+              <v-avatar size="130" class="avatar-img">
+                <v-img :src="route.query.image" />
+              </v-avatar>
               <h2 class="name">{{ route.query.name }} {{ route.query.lastName }}</h2>
-            </v-card-title>
+              <p class="job">{{ route.query.job }}</p>
+              <p class="location">📍 {{ route.query.location }}</p>
+              <span class="badge" :class="availability.toLowerCase()">{{ availability }}</span>
+            </div>
 
-            <v-card-subtitle class="text-center job-title mb-4">
-              {{ route.query.job }}
-            </v-card-subtitle>
+            <div class="rating-summary mb-6">
+              <h3 class="rating-number">⭐ {{ averageRating.toFixed(1) }}/5</h3>
+              <p class="text-muted">{{ reviews.length }} корисници го оценија овој мајстор</p>
+            </div>
 
-            <v-card-text class="description text-center">
-              {{ route.query.description || 'Описот не е достапен.' }}
-            </v-card-text>
+            <div class="section">
+              <h3>Биографија</h3>
+              <p>{{ route.query.description || "Описот не е достапен." }}</p>
+            </div>
 
-            <v-card-actions class="justify-center mt-4">
-              <v-btn
-                color="primary"
-                class="contact-btn"
-                rounded
-                size="large"
-              >
-                <v-icon start>mdi-handshake</v-icon>
-                Hire Now
+            <div class="section">
+              <h3>Услуги</h3>
+              <ul class="services-list">
+                <li v-for="service in route.query.services || ['Не е наведено']" :key="service">🔧 {{ service }}</li>
+              </ul>
+            </div>
+
+            <div class="section">
+              <h3>Проекти</h3>
+              <v-row dense>
+                <v-col v-for="(img, i) in portfolioImages" :key="i" cols="6">
+                  <v-img :src="img" height="140" class="rounded" cover />
+                </v-col>
+              </v-row>
+            </div>
+
+            <div class="section">
+              <h3>Контакт информации</h3>
+              <p>📞 {{ route.query.phone || 'Нема информација' }}</p>
+              <p>✉️ {{ route.query.email || 'Нема информација' }}</p>
+              <p>🌐 Профил: <a :href="route.query.website || '#'" target="_blank" class="text-link">Веб страна</a></p>
+            </div>
+
+            <div class="section">
+              <h3>Рецензии</h3>
+              <div class="review" v-for="(r, i) in reviews" :key="i">
+                <strong>{{ r.name }}</strong> - ⭐ {{ r.rating }}/5
+                <p>{{ r.comment }}</p>
+              </div>
+
+              <v-btn class="write-review mt-3" color="warning" variant="flat">
+                Напиши рецензија
               </v-btn>
-              <v-btn
-                color="grey lighten-2"
-                class="back-btn"
-                rounded
-                size="large"
-                @click="goBack"
-              >
-                <v-icon start>mdi-arrow-left</v-icon>
-                Go Back
-              </v-btn>
-            </v-card-actions>
-          </v-card>
-        </v-col>
-      </v-row>
-    </v-container>
+            </div>
+
+            <v-btn
+              class="back-btn mt-6"
+              size="large"
+              rounded
+              @click="goBack"
+            >
+              <v-icon start>mdi-arrow-left</v-icon>
+              Назад кон мајсторите
+            </v-btn>
+          </v-col>
+        </v-row>
+      </v-container>
+    </section>
   </DefaultLayout>
 </template>
 
 <style scoped>
-.details-container {
-  background: linear-gradient(135deg, #f4f7f9, #e0e5eb);
+.details-wrapper {
+  background: linear-gradient(135deg, #1c1c1c, #101010);
+  padding-top: 130px;
+  padding-bottom: 80px;
+  color: #fff;
   min-height: 100vh;
 }
 
-.details-card {
-  transition: all 0.3s ease-in-out;
-  overflow: hidden;
+.profile-box {
+  text-align: center;
+  margin-bottom: 40px;
 }
 
-.details-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+.avatar-img {
+  border: 4px solid #ffc107;
+  box-shadow: 0 6px 18px rgba(255, 193, 7, 0.3);
+  margin: 0 auto 16px;
 }
 
 .name {
-  font-weight: 700;
-  font-size: 1.7rem;
-  color: #2c3e50;
+  font-size: 2rem;
+  font-weight: 800;
+  color: #ffc107;
 }
 
-.job-title {
-  font-weight: 600;
+.job {
   font-size: 1.1rem;
-  color: #616161;
+  color: #ccc;
 }
 
-.description {
+.location {
   font-size: 0.95rem;
-  color: #555;
-  line-height: 1.6;
-  padding: 0 10px;
+  color: #aaa;
+  margin-bottom: 8px;
 }
 
-.contact-btn {
-  background: linear-gradient(135deg, #42a5f5, #1e88e5);
-  color: white !important;
+.badge {
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  display: inline-block;
+  margin-top: 6px;
+  text-transform: uppercase;
+}
+
+.badge.онлајн {
+  background-color: #4caf50;
+  color: white;
+}
+.badge.зафатен {
+  background-color: #ff9800;
+  color: white;
+}
+.badge.недостапен {
+  background-color: #f44336;
+  color: white;
+}
+
+.section {
+  margin-bottom: 30px;
+}
+
+.section h3 {
+  font-size: 1.4rem;
+  font-weight: 700;
+  margin-bottom: 12px;
+  color: #ffc107;
+}
+
+.services-list {
+  padding-left: 20px;
+  color: #eee;
+}
+
+.services-list li {
+  margin-bottom: 8px;
+  list-style: none;
+}
+
+.review {
+  background: rgba(255, 255, 255, 0.04);
+  padding: 16px;
+  border-radius: 12px;
+  margin-bottom: 14px;
+  color: #eee;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.rating-summary {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.rating-number {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #ffc107;
+}
+
+.text-muted {
+  color: #aaa;
+  font-size: 0.95rem;
+}
+
+.write-review {
   font-weight: bold;
-  box-shadow: 0 4px 10px rgba(33, 150, 243, 0.3);
-  transition: transform 0.2s ease;
-}
-
-.contact-btn:hover {
-  transform: translateY(-2px);
 }
 
 .back-btn {
-  background-color: #eeeeee !important;
-  color: #333 !important;
+  background-color: #ffc107 !important;
+  color: black !important;
   font-weight: 600;
-  transition: transform 0.2s ease;
 }
 
-.back-btn:hover {
-  background-color: #e0e0e0 !important;
-  transform: translateY(-2px);
+.text-link {
+  color: #ffc107;
+  text-decoration: underline;
 }
 </style>

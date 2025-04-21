@@ -223,17 +223,19 @@ onMounted(() => {
 @import "@mdi/font/css/materialdesignicons.min.css";
 
 .favourites-container {
-  padding: 40px 20px;
+  padding: 110px 20px 40px; /* added top padding here */
   text-align: center;
   min-height: 100vh;
   background: linear-gradient(135deg, #181818, #101010);
 }
 
+
 h2 {
-  font-size: 2rem;
-  font-weight: 700;
+  font-size: 3.4rem;
+  font-weight: 900;
   color: #ffc107;
-  margin-bottom: 40px;
+  text-shadow: 0 0 12px rgba(255, 193, 7, 0.4), 0 0 24px rgba(255, 193, 7, 0.2);
+  letter-spacing: -1px;
 }
 
 .empty-state {
@@ -267,13 +269,15 @@ h2 {
 
 .services-container {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-  gap: 30px;
-  max-width: 1200px;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  max-width: 1000px;
   margin: 0 auto;
   padding: 10px;
+  gap: 20px; /* slightly bigger for better breathing room */
   justify-items: center;
+  margin-top: 25px;
 }
+
 
 .service-card-glass {
   background: rgba(255, 255, 255, 0.06);

@@ -11,7 +11,7 @@ const scrollToNext = () => {
   <div class="hero-banner">
     <div class="overlay"></div>
     <div class="hero-content animate-fade">
-      <p class="tagline"># Поврзи се лесно</p>
+      <p class="tagline">Поврзи се лесно</p>
       <h1 class="hero-title">
         Најди го <span class="highlight">најдобриот мајстор</span><br />
         за било што, било кога.
@@ -165,8 +165,11 @@ const scrollToNext = () => {
   .tagline {
     font-size: 0.9rem;
   }
-}
 
+  .hero-banner {
+    background-attachment: scroll !important;
+}
+}
 @media (max-width: 500px) {
   .hero-title {
     font-size: 2.2rem;

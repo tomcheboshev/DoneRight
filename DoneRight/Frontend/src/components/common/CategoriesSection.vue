@@ -37,13 +37,17 @@ const services = [
 
 <style scoped>
 .categories {
+  position: relative;
   padding: 100px 20px;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 40px;
-  background: radial-gradient(ellipse at center, #1c1c1c 0%, #121212 100%);
+  background: linear-gradient(to bottom right, #2b2b2b, #1f1f1f);
+  overflow: hidden;
+  z-index: 1;
 }
+
 
 .section-header {
   text-align: center;

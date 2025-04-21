@@ -32,15 +32,13 @@ import QrCodeImage from '@/assets/QR.png'
 </template>
 
 <style scoped>
-
-  .mobile-app-section {
-  background: linear-gradient(135deg, #1f1f1f, #121212);
-  padding: 50px 30px;
+.mobile-app-section {
+  background: linear-gradient(to bottom right, #2b2b2b, #1f1f1f);
+  padding: 80px 20px;
   color: #fff;
-  border-radius: 24px;
-  margin: 40px auto;
-  max-width: 1200px;
-  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.5);
+  border-radius: 0; /* Optional: remove round corners if full-width look is desired */
+  max-width: 100%;
+  box-shadow: none;
   overflow: hidden;
   position: relative;
 }
@@ -48,9 +46,11 @@ import QrCodeImage from '@/assets/QR.png'
 .content {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: center;
   flex-wrap: wrap;
   gap: 40px;
+  max-width: 1200px;
+  margin: 0 auto;
 }
 
 .text-content {

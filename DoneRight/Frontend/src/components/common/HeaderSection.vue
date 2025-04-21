@@ -75,7 +75,7 @@ onMounted(() => {
         variant="text"
         class="nav-btn"
       >
-        Табла
+        Дашборд
       </v-btn>
 
       <v-btn

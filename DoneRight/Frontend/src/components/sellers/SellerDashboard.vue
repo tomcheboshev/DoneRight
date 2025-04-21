@@ -1,87 +1,81 @@
 <template>
   <v-app>
-    <div class="layout-wrapper" :class="{ 'is-rail': isRail }">
-      <!-- Sidebar -->
-      <v-navigation-drawer
-        v-model="drawer"
-        :rail="isRail"
-        :temporary="$vuetify.display.smAndDown"
-        width="260"
-        rail-width="72"
-        class="frosted-sidebar"
-        app
-      >
-        <div class="sidebar-header" :class="{ 'rail-mode': isRail }">
-          <v-avatar size="48">
-            <v-img :src="logo" alt="Logo" cover />
-          </v-avatar>
-          <span v-if="!isRail" class="ml-3 logo-text">DoneRight</span>
-        </div>
+    <div class="layout-wrapper">
+      <!-- Sidebar, AppBar ... како што веќе имаш -->
 
-        <v-divider class="mb-2" />
-
-        <!-- Navigation -->
-        <v-list nav dense>
-          <v-tooltip
-            v-for="item in navItems"
-            :key="item.title"
-            location="right"
-            :disabled="!isRail"
-          >
-            <template #activator="{ props }">
-              <v-list-item
-                v-bind="props"
-                :to="item.route"
-                link
-                class="sidebar-link"
-              >
-                <div class="sidebar-content">
-                  <v-icon class="sidebar-icon" size="24">{{ item.icon }}</v-icon>
-                  <span v-if="!isRail" class="sidebar-text">{{ item.title }}</span>
-                </div>
-              </v-list-item>
-            </template>
-            <span>{{ item.title }}</span>
-          </v-tooltip>
-        </v-list>
-      </v-navigation-drawer>
-
-      <!-- App Bar -->
-      <v-app-bar flat color="#121212" class="elevation-1 topbar">
-        <v-app-bar-nav-icon class="d-sm-none text-yellow-darken-2" @click="drawer = !drawer" />
-        <v-toolbar-title class="text-yellow font-weight-bold">🔥 DoneRight Табла</v-toolbar-title>
-        <v-spacer />
-        <v-btn icon class="text-yellow-darken-2"><v-icon>mdi-bell-outline</v-icon></v-btn>
-        <v-btn icon class="text-yellow-darken-2"><v-icon>mdi-account-circle</v-icon></v-btn>
-      </v-app-bar>
-
-      <!-- Main Content -->
       <v-main class="main-area">
-        <v-container>
-          <transition name="fade-slide">
-            <v-card class="welcome-card" elevation="2">
-              <v-card-title class="text-white">👋 Добредојде назад, Мајсторе!</v-card-title>
-              <v-card-subtitle class="text-white">Продолжи со одличната работа!</v-card-subtitle>
-            </v-card>
-          </transition>
+        <v-container fluid>
+          <h1 class="dashboard-title">Добредојде назад, {{ username }} 👋</h1>
 
-          <v-row class="mt-4">
-            <v-col cols="12" sm="6" md="4" v-for="stat in stats" :key="stat.title">
-              <v-hover v-slot="{ isHovering, props }">
-                <v-card
-                  v-bind="props"
-                  :elevation="isHovering ? 12 : 3"
-                  class="stat-card"
-                >
-                  <v-card-title>
-                    <v-icon class="mr-2 text-yellow" size="28">{{ stat.icon }}</v-icon>
-                    <strong class="text-white">{{ stat.title }}</strong>
-                  </v-card-title>
-                  <v-card-subtitle class="text-grey-lighten-1">{{ stat.subtitle }}</v-card-subtitle>
-                </v-card>
-              </v-hover>
+          <!-- Status & Quick Info -->
+          <v-row>
+            <v-col cols="12" sm="6" md="3">
+              <v-card class="stat-card status-card">
+                <v-icon size="28" color="green">mdi-checkbox-marked-circle-outline</v-icon>
+                <div>
+                  <h4 class="status-text">Онлајн</h4>
+                  <p class="status-sub">Статус на достапност</p>
+                </div>
+              </v-card>
+            </v-col>
+
+            <v-col cols="12" sm="6" md="3" v-for="metric in metrics" :key="metric.title">
+              <v-card class="stat-card">
+                <v-icon :color="metric.color" size="28" class="mb-2">{{ metric.icon }}</v-icon>
+                <h3 class="stat-number">{{ metric.value }}</h3>
+                <p class="stat-label">{{ metric.title }}</p>
+              </v-card>
             </v-col>
           </v-row>
+
+          <!-- Upcoming Jobs -->
+          <div class="section">
+            <h2 class="section-title">Закажани работи</h2>
+            <v-table class="custom-table">
+              <thead>
+                <tr>
+                  <th>Клиент</th>
+                  <th>Услуга</th>
+                  <th>Датум</th>
+                  <th>Локација</th>
+                  <th>Статус</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="job in upcomingJobs" :key="job.id">
+                  <td>{{ job.client }}</td>
+                  <td>{{ job.service }}</td>
+                  <td>{{ job.date }}</td>
+                  <td>{{ job.location }}</td>
+                  <td><v-chip :color="job.statusColor" small>{{ job.status }}</v-chip></td>
+                </tr>
+              </tbody>
+            </v-table>
+          </div>
+
+          <!-- Reviews -->
+          <div class="section">
+            <h2 class="section-title">Најнови рецензии</h2>
+            <v-row>
+              <v-col cols="12" sm="6" md="4" v-for="r in latestReviews" :key="r.name">
+                <v-card class="review-card">
+                  <div class="d-flex justify-space-between align-center mb-2">
+                    <strong>{{ r.name }}</strong>
+                    <v-rating :value="r.rating" readonly dense color="yellow-darken-2" />
+                  </div>
+                  <p class="text-white">{{ r.comment }}</p>
+                </v-card>
+              </v-col>
+            </v-row>
+          </div>
+
+          <!-- Chart (Activity Overview Placeholder) -->
+          <div class="section">
+            <h2 class="section-title">Активности</h2>
+            <v-sheet height="200" class="chart-placeholder d-flex align-center justify-center">
+              <p class="text-grey">📊 Тука можеш да вметнеш график за активности (bar/line chart)</p>
+            </v-sheet>
+          </div>
         </v-container>
       </v-main>
     </div>
@@ -89,141 +83,102 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
-import logo from '@/assets/logo.png'
 
-const drawer = ref(true)
-const isRail = ref(false)
+const username = 'Мајсторе'
 
-const navItems = [
-  { title: 'Табла', icon: 'mdi-view-dashboard', route: '/' },
-  { title: 'Корисници', icon: 'mdi-account-group-outline', route: '/users' },
-  { title: 'Извештаи', icon: 'mdi-chart-box-outline', route: '/reports' },
-  { title: 'Поставки', icon: 'mdi-cog-outline', route: '/settings' }
+const metrics = [
+  { title: 'Приходи овој месец', value: '$2,340', icon: 'mdi-cash', color: 'green' },
+  { title: 'Завршени задачи', value: '14', icon: 'mdi-check-circle', color: 'yellow-darken-2' },
+  { title: 'Активни понуди', value: '3', icon: 'mdi-briefcase-outline', color: 'blue' }
 ]
 
-const stats = [
-  { title: 'Активни корисници', subtitle: '1,482 онлајн во моментот', icon: 'mdi-account' },
-  { title: 'Приходи', subtitle: '$42,300 овој месец', icon: 'mdi-currency-usd' },
-  { title: 'Завршени задачи', subtitle: '86% комплетирани', icon: 'mdi-check-circle-outline' }
+const upcomingJobs = [
+  { id: 1, client: 'Јана', service: 'Електричар', date: '25.04.2025', location: 'Скопје', status: 'Потврдено', statusColor: 'green' },
+  { id: 2, client: 'Марко', service: 'Водовод', date: '27.04.2025', location: 'Битола', status: 'Во тек', statusColor: 'blue' }
+]
+
+const latestReviews = [
+  { name: 'Стефан', rating: 5, comment: 'Супер работа, професионално и брзо!' },
+  { name: 'Марија', rating: 4, comment: 'Малку доцнеше, но добра изведба.' }
 ]
 </script>
 
 <style scoped>
 .layout-wrapper {
-  transition: all 0.3s ease;
-  margin-left: 260px;
-}
-.layout-wrapper.is-rail {
-  margin-left: 72px;
-}
-@media (max-width: 960px) {
-  .layout-wrapper,
-  .layout-wrapper.is-rail {
-    margin-left: 0;
-  }
-}
-
-.main-area {
   background: #121212;
   min-height: 100vh;
-  padding: 20px;
+  padding: 30px 20px;
 }
 
-/* Sidebar */
-.frosted-sidebar {
-  background: #1a1a1a;
-  backdrop-filter: blur(12px);
-  color: white;
+.dashboard-title {
+  font-size: 2.2rem;
+  color: #ffc107;
+  font-weight: 800;
+  margin-bottom: 30px;
 }
 
-/* Sidebar Header */
-.sidebar-header {
-  display: flex;
-  align-items: center;
-  padding: 16px;
+.section {
+  margin-top: 40px;
 }
-.sidebar-header.rail-mode {
-  flex-direction: column;
-}
-.logo-text {
+
+.section-title {
+  font-size: 1.4rem;
+  color: #ffc107;
   font-weight: bold;
-  font-size: 20px;
-  color: #ffc107;
+  margin-bottom: 16px;
 }
 
-/* Nav Items */
-.sidebar-link {
-  padding: 6px 10px;
-  border-radius: 8px;
-  margin: 4px 10px;
-  transition: 0.2s;
+.stat-card {
+  background: #1e1e1e;
+  border-radius: 14px;
+  padding: 20px;
+  color: white;
+  text-align: center;
+  transition: all 0.3s ease;
 }
-.sidebar-link:hover {
-  background-color: rgba(255, 255, 255, 0.08);
+
+.stat-card:hover {
+  transform: translateY(-5px);
 }
-.sidebar-content {
+
+.stat-number {
+  font-size: 1.8rem;
+  font-weight: bold;
+}
+
+.stat-label {
+  font-size: 0.95rem;
+  color: #bbb;
+}
+
+.status-card {
   display: flex;
   align-items: center;
-  gap: 12px;
-}
-.sidebar-icon {
-  color: #ffc107;
-}
-.sidebar-text {
-  font-size: 15px;
-  font-weight: 500;
-  color: white;
-}
-.frosted-sidebar.v-navigation-drawer--rail .sidebar-content {
-  flex-direction: column;
-}
-.frosted-sidebar.v-navigation-drawer--rail .sidebar-text {
-  display: none;
-}
-
-/* Welcome card */
-.welcome-card {
-  background: linear-gradient(90deg, #ffc107, #e3a600);
-  border-radius: 12px;
-  padding: 20px;
-  animation: fadeIn 0.5s ease-out;
-}
-
-/* Stat Cards */
-.stat-card {
-  border-radius: 12px;
-  padding: 18px;
+  gap: 16px;
+  justify-content: center;
   background-color: #1f1f1f;
-  transition: 0.3s ease;
-}
-.stat-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 10px 20px rgba(255, 193, 7, 0.1);
 }
 
-/* Transitions */
-.fade-slide-enter-active {
-  animation: fadeSlideIn 0.4s ease;
+.status-text {
+  font-size: 1.2rem;
+  color: #4caf50;
+  font-weight: bold;
 }
-@keyframes fadeSlideIn {
-  0% {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-  100% {
-    opacity: 1;
-    transform: translateY(0);
-  }
+
+.status-sub {
+  color: #ccc;
+  font-size: 0.8rem;
 }
-@keyframes fadeIn {
-  0% {
-    opacity: 0;
-    transform: scale(0.95);
-  }
-  100% {
-    opacity: 1;
-    transform: scale(1);
-  }
+
+.review-card {
+  background-color: #1a1a1a;
+  padding: 16px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.chart-placeholder {
+  background: #1c1c1c;
+  border-radius: 12px;
 }
 </style>
